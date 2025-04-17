@@ -26,7 +26,7 @@ public class Connected extends BasicGame {
 
     @Override
     public void init(GameContainer gc) throws SlickException {
-        map = new TiledMap("res/testmap/Testmap.tmx", "res/testmap");
+        map = new TiledMap("res/Map/Map.tmx", "res/Map");
         player = new Player((float) (map.getWidth() * map.getTileWidth()) / 2, (float) (map.getHeight() * map.getTileHeight()) / 2, map);
         camera = new Camera();
         camera.setMap(map);
@@ -37,17 +37,17 @@ public class Connected extends BasicGame {
         quitButton = new UIButton(gc, (float) (gc.getWidth() - 200) / 2, (float) (gc.getHeight() - 150) / 2, 200, 50, "Spiel beenden", font);
         resumeButton = new UIButton(gc, (float) (gc.getWidth() - 200) / 2, (float) (gc.getHeight() - 250) / 2, 200, 50, "Fortsetzen", font);
 
-        int spawnerLayerIndex = map.getLayerIndex("spawner.enemy");
-        for (int x = 0; x < map.getWidth(); x++) {
-            for (int y = 0; y < map.getHeight(); y++) {
-                int tileId = map.getTileId(x, y, spawnerLayerIndex);
-                if (tileId != 0) {
-                    float worldX = x * map.getTileWidth();
-                    float worldY = y * map.getTileHeight();
-                    spawners.add(new EnemySpawner(worldX, worldY));
-                }
-            }
-        }
+//        int spawnerLayerIndex = map.getLayerIndex("spawner.enemy");
+//        for (int x = 0; x < map.getWidth(); x++) {
+//            for (int y = 0; y < map.getHeight(); y++) {
+//                int tileId = map.getTileId(x, y, spawnerLayerIndex);
+//                if (tileId != 0) {
+//                    float worldX = x * map.getTileWidth();
+//                    float worldY = y * map.getTileHeight();
+//                    spawners.add(new EnemySpawner(worldX, worldY));
+//                }
+//            }
+//        }
     }
 
     @Override
@@ -80,7 +80,6 @@ public class Connected extends BasicGame {
         player.punch(leftClick);
         camera.update(player.getX(), player.getY(), gc.getWidth(), gc.getHeight(), delta);
 
-        // Spawner aktualisieren und neue Gegner hinzufügen
         for (EnemySpawner spawner : spawners) {
             Enemy newEnemy = spawner.update(delta, player, map);
             if (newEnemy != null) {
@@ -88,7 +87,6 @@ public class Connected extends BasicGame {
             }
         }
 
-        // Gegner aktualisieren
         for (Enemy enemy : enemies) {
             enemy.update(delta);
         }

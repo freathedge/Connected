@@ -20,8 +20,6 @@ public class Player {
     private long punchCircleStartTime = 0;
     private final int punchCircleDuration = 1000;
 
-
-
     public enum Direction {
         FRONT, BACK, LEFT, RIGHT
     }
@@ -69,23 +67,15 @@ public class Player {
         switch (direction) {
             case FRONT:
                 currentImage = front;
-                width = 27;
-                height = 35;
                 break;
             case BACK:
                 currentImage = back;
-                width = 41;
-                height = 41;
                 break;
             case LEFT:
                 currentImage = left;
-                width = 34;
-                height = 38;
                 break;
             case RIGHT:
                 currentImage = right;
-                width = 34;
-                height = 38;
                 break;
         }
     }
@@ -119,7 +109,6 @@ public class Player {
         return height;
     }
 
-
     public void move(float delta, boolean up, boolean down, boolean left, boolean right) throws SlickException {
         float dx = 0;
         float dy = 0;
@@ -136,38 +125,58 @@ public class Player {
             dy += 1;
         }
 
-        // Wenn keine Taste gedrückt wird → Richtung auf FRONT setzen
         if (!up && !down && !left && !right) {
             setDirection(Direction.FRONT);
         } else {
-            // Normiere bei diagonaler Bewegung
             if (dx != 0 && dy != 0) {
                 float length = (float) Math.sqrt(dx * dx + dy * dy);
                 dx /= length;
                 dy /= length;
             }
 
-            // Richtung setzen basierend auf letzter Bewegung
             if (dy < 0) {
                 setDirection(Direction.BACK);
             } else if (dy > 0) {
                 setDirection(Direction.FRONT);
             } else if (dx < 0) {
                 setDirection(Direction.LEFT);
-            } else if (dx > 0) {
+            } else {
                 setDirection(Direction.RIGHT);
             }
         }
 
-        float playerSpeed = speed * delta;
+        float currentSpeed = speed;
+
+        int tileSize = map.getTileWidth();
+        int floorLayerIndex = map.getLayerIndex("Floor");
+        if (floorLayerIndex != -1) {
+            // Untere linke Ecke
+            int bottomLeftX = (int)(x / tileSize);
+            int bottomLeftY = (int)((y + height - 1) / tileSize);
+
+            // Untere rechte Ecke
+            int bottomRightX = (int)((x + width - 1) / tileSize);
+            int bottomRightY = bottomLeftY;
+
+            // Tile-IDs der unteren linken und rechten Ecke
+            int leftTileID = map.getTileId(bottomLeftX, bottomLeftY, floorLayerIndex);
+            int rightTileID = map.getTileId(bottomRightX, bottomRightY, floorLayerIndex);
+
+            // Wenn eine der Ecken auf einem "Floor"-Layer steht, dann verlangsame die Bewegung
+            if (leftTileID != 0 || rightTileID != 0) {
+                currentSpeed *= 0.6f; // Verlangsamung auf "Floor"-Layer
+            }
+        }
+
+        float playerSpeed = currentSpeed * delta;
         float nextX = x + dx * playerSpeed;
         float nextY = y + dy * playerSpeed;
 
-        if (isBlocked(nextX, y)) {
+        if (!isBlocked(nextX, y)) {
             x = nextX;
         }
 
-        if (isBlocked(x, nextY)) {
+        if (!isBlocked(x, nextY)) {
             y = nextY;
         }
     }
@@ -176,34 +185,62 @@ public class Player {
 
     private boolean isBlocked(float x, float y) {
         int tileSize = map.getTileWidth();
-        int wallLayer = 1;
 
-        int[][] checkPoints = getCheckPoints(x, y, tileSize);
+        // Toleranz einbauen, damit obere Kante nicht zu hoch erkannt wird
+        float tolerance = 1f;
 
-        for (int[] point : checkPoints) {
-            int tileX = point[0];
-            int tileY = point[1];
+        // Kanten des Spielers
+        int left = (int)((x + tolerance) / tileSize);
+        int right = (int)((x + width - 1 - tolerance) / tileSize);
+        int top = (int)((y + tolerance) / tileSize);  // <- hier der Fix!
+        int bottom = (int)((y + height - 1 - tolerance) / tileSize);
 
-            if (tileX < 0 || tileY < 0 || tileX >= map.getWidth() || tileY >= map.getHeight()) {
-                return false;
+        int wallLayerIndex = map.getLayerIndex("wall");
+        if (wallLayerIndex == -1) return false;
+
+        // obere Kante prüfen
+        for (int i = left; i <= right; i++) {
+            if (map.getTileId(i, top, wallLayerIndex) != 0) {
+                return true;
             }
-
-            int tileID = map.getTileId(tileX, tileY, wallLayer);
-            if (tileID != 0) return false;
         }
 
-        return true;
+        // untere Kante prüfen
+        for (int i = left; i <= right; i++) {
+            if (map.getTileId(i, bottom, wallLayerIndex) != 0) {
+                return true;
+            }
+        }
+
+        // linke Kante prüfen
+        for (int i = top; i <= bottom; i++) {
+            if (map.getTileId(left, i, wallLayerIndex) != 0) {
+                return true;
+            }
+        }
+
+        // rechte Kante prüfen
+        for (int i = top; i <= bottom; i++) {
+            if (map.getTileId(right, i, wallLayerIndex) != 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
+
+
+
+
+
+
+
+
     private int[][] getCheckPoints(float x, float y, int tileSize) {
-
-        return getInts(x, y, tileSize);
-    }
-
-    int[][] getInts(float x, float y, int tileSize) {
         return new int[][]{
-                { (int)(x / tileSize),             (int)(y / tileSize) },
+                { (int)(x / tileSize),                 (int)(y / tileSize) },
                 { (int)((x + this.width - 1) / tileSize), (int)(y / tileSize) },
-                { (int)(x / tileSize),             (int)((y + this.height - 1) / tileSize) },
+                { (int)(x / tileSize),                 (int)((y + this.height - 1) / tileSize) },
                 { (int)((x + this.width - 1) / tileSize), (int)((y + this.height - 1) / tileSize) }
         };
     }
@@ -215,7 +252,4 @@ public class Player {
             punchCircleStartTime = System.currentTimeMillis();
         }
     }
-
-
 }
-
