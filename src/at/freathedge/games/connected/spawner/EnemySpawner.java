@@ -16,7 +16,7 @@ public class EnemySpawner {
     public EnemySpawner(float x, float y) {
         this.x = x;
         this.y = y;
-        this.spawnCooldown = 30000 + random.nextInt(60000);
+        this.spawnCooldown = 10000 + random.nextInt(60000);
     }
 
     public Enemy update(int delta, Player player, TiledMap map) throws SlickException {
