@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="50" tileheight="50" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" source="Floor.tsx"/>
+ <tileset firstgid="2" source="Wall.tsx"/>
+ <layer id="1" name="Kachelebene 1" width="30" height="30">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu3DAQ0AAAzDoM6/6Qs5JKyaqqqq7x6slrLfEA4AAA==
+  </data>
+ </layer>
+ <layer id="2" name="Kachelebene 2" width="30" height="30">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu3UYQoAMASGYbn/oXeDjT6mtVf5R08UbmY+lLdDcZUZTrXZPUXtiJuNTnfX1z0v7n9u1x1V/b4X/yQuLi4uLi6u5k7kAgtpALsQDgAA
+  </data>
+ </layer>
+</map>

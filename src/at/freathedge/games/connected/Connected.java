@@ -19,8 +19,9 @@ public class Connected extends BasicGame {
 
     @Override
     public void init(GameContainer gc) throws SlickException {
-        map = new TiledMap("res/testmap.tmx");
-        player = new Player(0, 0);
+        map = new TiledMap("res/Testmap/Testmap.tmx", "res/Testmap");
+        System.out.println("map: " + map.getWidth() + ", " + map.getHeight());
+        player = new Player((map.getWidth() * map.getTileWidth()) / 2, (map.getHeight() * map.getTileHeight()) / 2);
         camera = new Camera();
     }
 
@@ -37,26 +38,13 @@ public class Connected extends BasicGame {
         if (input.isKeyDown(Input.KEY_A)) nextX -= speed;
         if (input.isKeyDown(Input.KEY_D)) nextX += speed;
 
-        // Berechne die zukünftige Hitbox des Spielers
-        Rectangle futureHitbox = new Rectangle(nextX, nextY, player.getWidth(), player.getHeight());
-
-        boolean collides = false;
-
-        // Kollisionsprüfung mit den fixen Wandhitboxen
-//        for (Rectangle wall : map.getWallHitboxes()) {
-//            // Die Wandhitboxen sind fix auf den Weltkoordinaten
-//            if (futureHitbox.intersects(wall)) {
-//                collides = true;
-//                break;
-//            }
-//        }
-
-        // Wenn keine Kollision vorliegt, die Position des Spielers aktualisieren
-        if (!collides) {
-            player.setPosition(nextX, nextY);
+        if (!isBlocked(nextX, player.getY())) {
+            player.setX(nextX);
+        }
+        if (!isBlocked(player.getX(), nextY)) {
+            player.setY(nextY);
         }
 
-        // Kamera aktualisieren (beeinflusst nur das Rendering, nicht die Positionen der Objekte)
         camera.update(player.getX(), player.getY(), gc.getWidth(), gc.getHeight(), delta);
     }
 
@@ -64,22 +52,46 @@ public class Connected extends BasicGame {
     public void render(GameContainer gc, Graphics g) throws SlickException {
         camera.apply(g);
 
-        map.render(0, 0, 0);
+        for (int i = 0; i < map.getLayerCount(); i++) {
+            map.render(0, 0, i);
+        }
 
-        // Spieler rendern
         player.render(g);
 
-        // Debug: Zeichne Hitboxen der Wände (Die Hitboxen sind fix und werden nicht verschoben)
-        g.setColor(Color.red);
-//        for (Rectangle wall : map.getWallHitboxes()) {
-//            // Wandhitbox bleibt fix an den Weltkoordinaten
-//            g.draw(wall); // Hier wird nur die Hitbox gezeichnet, aber nicht beeinflusst
-//        }
-
-        // Debug: Zeichne Hitbox des Spielers
-        g.setColor(Color.green);
-        g.draw(player.getHitbox()); // Spielerhitbox bleibt ebenfalls fix
     }
+
+    private boolean isBlocked(float x, float y) {
+        int tileSize = map.getTileWidth(); // oder getTileHeight(), sollten gleich sein
+        int wallLayer = 1; // Die Wände sind in Layer 1 (achte auf den richtigen Index)
+
+        // Spielergröße in Pixeln
+        int playerWidth = 40;
+        int playerHeight = 40;
+
+        // Alle 4 Ecken des Spielers berechnen
+        int[][] checkPoints = {
+                { (int)(x / tileSize),             (int)(y / tileSize) }, // oben links
+                { (int)((x + playerWidth - 1) / tileSize), (int)(y / tileSize) }, // oben rechts
+                { (int)(x / tileSize),             (int)((y + playerHeight - 1) / tileSize) }, // unten links
+                { (int)((x + playerWidth - 1) / tileSize), (int)((y + playerHeight - 1) / tileSize) } // unten rechts
+        };
+
+        for (int[] point : checkPoints) {
+            int tileX = point[0];
+            int tileY = point[1];
+
+            // Sicherheit: Kollision außerhalb der Map vermeiden
+            if (tileX < 0 || tileY < 0 || tileX >= map.getWidth() || tileY >= map.getHeight()) {
+                return true; // Rand der Map blockiert
+            }
+
+            int tileID = map.getTileId(tileX, tileY, wallLayer);
+            if (tileID != 0) return true; // Blockiert, wenn Tile vorhanden
+        }
+
+        return false; // Alle Ecken frei
+    }
+
 
     public static void main(String[] args) {
         try {

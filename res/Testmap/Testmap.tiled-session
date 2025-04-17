@@ -3,44 +3,43 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "sprites/Map/testmap.tmx",
+    "activeFile": "Testmap.tmx",
     "expandedProjectPaths": [
-        "sprites",
         "."
     ],
     "fileStates": {
-        "sprites/Floor.tsx": {
+        "Floor.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
-        "sprites/Map/testmap.tmx": {
+        "Testmap.tmx": {
             "scale": 0.5,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 771,
-                "y": 690
+                "x": 623,
+                "y": 782
             }
         },
-        "sprites/Wall.tsx": {
+        "Wall.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
         }
     },
-    "last.imagePath": "E:/coding/Java/SWP Games/src/at/freathedge/games/connected/sprites",
+    "last.imagePath": "E:/coding/Java/Games/Connected/res/Testmap/images",
     "map.height": 30,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 50,
     "map.tileWidth": 50,
     "openFiles": [
-        "sprites/Map/testmap.tmx",
-        "sprites/Floor.tsx",
-        "sprites/Wall.tsx"
+        "Testmap.tmx",
+        "Floor.tsx",
+        "Wall.tsx"
     ],
-    "project": "Level1Map.tiled-project",
+    "project": "Testmap.tiled-project",
     "recentFiles": [
-        "sprites/Wall.tsx",
-        "sprites/Floor.tsx",
-        "sprites/Map/testmap.tmx"
+        "Wall.tsx",
+        "Floor.tsx",
+        "Testmap.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
