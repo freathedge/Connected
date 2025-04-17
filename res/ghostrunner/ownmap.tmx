@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="40" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" source="tilea2.tsx"/>
+ <layer id="1" name="Kachelebene 1" width="40" height="40">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACt3XXQqDMAwHcH2o7HngFXYDd4CdxvufYAgGQkjTtPnHfTwEYdr2t6S2dZ6maf7heCnxaZPHG+njdkamEeHLcqJ9PcYni4waazaPrwib5UPn7ohlwNdqg/Kt51hLY8wrfJpzdvo2ZivONsjwGimKcF5lXB3Pbex5mctMq9entbsin6M+Cm4sA+3vDlvEJ/Mp6x6ZB9Hcyb68xlqsLPhvCB+5ev6L5UPVdcRXC5k3pBHh0+YeIp/oNWak3ruI2nxC2R5nkOvhdGXapI+uXteu9IPeO2T+vL6aC2njtbRsmk9zjexnLR/PXc+78C22Vm35FV1X632wfGTMOkv12CwfrzPKRmucp64eI/K9JRNf70b6sdaYqC9q40bNFz1ToWoR3T/Qttb+hjJG89Xjq42nndsR861lrH1rHPemhi/LJnMo86idKZE2b2298wv9nWM5M8b4t3gDrfbc5AAZAAA=
+  </data>
+ </layer>
+ <layer id="2" name="wand" width="40" height="40">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu2XQQrAIAwE84Z+xv//rHcJaLKjFpsFoQezDpYm22Zm7eMrI6V21xmztafuoPiKL7LPq1P5ZupP9oi+3vM7zdec536P6q1o5HOab3RGlmPnjMrM1x18iopPU/FpisynbJ5VMvGo7xD5mpjvROan/hs8T0IP7GeL/EgVn+53E18kixC9YdX3RmXV297vjB8pko+czdm8PTqLFn1/tG7ho/ZE9Se+FSo+Tdn+uHO93a28igAZAAA=
+  </data>
+ </layer>
+</map>
