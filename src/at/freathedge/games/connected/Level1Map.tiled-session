@@ -1,0 +1,50 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "sprites/Map/testmap.tmx",
+    "expandedProjectPaths": [
+        "sprites",
+        "."
+    ],
+    "fileStates": {
+        "sprites/Floor.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "sprites/Map/testmap.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 771,
+                "y": 690
+            }
+        },
+        "sprites/Wall.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "E:/coding/Java/SWP Games/src/at/freathedge/games/connected/sprites",
+    "map.height": 30,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 50,
+    "map.tileWidth": 50,
+    "openFiles": [
+        "sprites/Map/testmap.tmx",
+        "sprites/Floor.tsx",
+        "sprites/Wall.tsx"
+    ],
+    "project": "Level1Map.tiled-project",
+    "recentFiles": [
+        "sprites/Wall.tsx",
+        "sprites/Floor.tsx",
+        "sprites/Map/testmap.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 50,
+        "width": 50
+    }
+}
