@@ -30,7 +30,7 @@ public class Connected extends BasicGame {
         player = new Player((float) (map.getWidth() * map.getTileWidth()) / 2, (float) (map.getHeight() * map.getTileHeight()) / 2, map);
         camera = new Camera();
         camera.setMap(map);
-        camera.zoom(1.6f);
+        camera.zoom(2f);
 
         java.awt.Font awtFont = new java.awt.Font("Verdana", java.awt.Font.BOLD, 24);
         TrueTypeFont font = new TrueTypeFont(awtFont, false);
@@ -69,7 +69,6 @@ public class Connected extends BasicGame {
             return;
         }
 
-        // Spiel fortsetzen
         boolean up = input.isKeyDown(Input.KEY_W);
         boolean down = input.isKeyDown(Input.KEY_S);
         boolean left = input.isKeyDown(Input.KEY_A);
@@ -78,6 +77,7 @@ public class Connected extends BasicGame {
 
         player.move(delta, up, down, left, right);
         player.punch(leftClick);
+        player.update(delta);
         camera.update(player.getX(), player.getY(), gc.getWidth(), gc.getHeight(), delta);
 
         for (EnemySpawner spawner : spawners) {

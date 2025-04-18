@@ -25,11 +25,19 @@
         },
         "E:/coding/Java/Games/Connected/res/Map/Map.tmx": {
             "scale": 1.5,
-            "selectedLayer": 1,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 783,
-                "y": 676.6666666666666
+                "x": 481.99999999999994,
+                "y": 483.99999999999994
             }
+        },
+        "E:/coding/Java/Games/Connected/res/Map/Oak_Tree_Small.tsx": {
+            "scaleInDock": 2,
+            "scaleInEditor": 1
+        },
+        "E:/coding/Java/Games/Connected/res/Map/Outdoor_Decor_Free.tsx": {
+            "scaleInDock": 2,
+            "scaleInEditor": 3
         },
         "E:/coding/Java/Games/Connected/res/Map/Path.tsx": {
             "scaleInDock": 1,
@@ -98,27 +106,23 @@
     "openFiles": [
         "E:/coding/Java/Games/Connected/res/Map/Map.tmx",
         "E:/coding/Java/Games/Connected/res/Map/Path.tsx",
-        "E:/coding/Java/Games/Connected/res/Map/Path_Middle.tsx",
-        "E:/coding/Java/Games/Connected/res/Map/Grass_Middle.tsx",
-        "E:/coding/Java/Games/Connected/res/Map/Cliff.tsx",
-        "E:/coding/Java/Games/Connected/res/Map/Water.tsx",
-        "E:/coding/Java/Games/Connected/res/Map/Water_Middle.tsx",
-        "E:/coding/Java/Games/Connected/res/Map/Beach.tsx"
+        "E:/coding/Java/Games/Connected/res/Map/Outdoor_Decor_Free.tsx",
+        "E:/coding/Java/Games/Connected/res/Map/Oak_Tree_Small.tsx"
     ],
     "project": "Testmap.tiled-project",
     "recentFiles": [
+        "E:/coding/Java/Games/Connected/res/Map/Oak_Tree_Small.tsx",
+        "E:/coding/Java/Games/Connected/res/Map/Outdoor_Decor_Free.tsx",
         "E:/coding/Java/Games/Connected/res/Map/Path.tsx",
+        "E:/coding/Java/Games/Connected/res/Map/Map.tmx",
         "E:/coding/Java/Games/Connected/res/Map/Path_Middle.tsx",
         "E:/coding/Java/Games/Connected/res/Map/Grass_Middle.tsx",
         "E:/coding/Java/Games/Connected/res/Map/Cliff.tsx",
         "E:/coding/Java/Games/Connected/res/Map/Water.tsx",
         "E:/coding/Java/Games/Connected/res/Map/Water_Middle.tsx",
         "E:/coding/Java/Games/Connected/res/Map/Beach.tsx",
-        "E:/coding/Java/Games/Connected/res/Map/Map.tmx",
         "Testmap.tmx",
-        "E:/coding/Java/Games/Connected/res/testmap/Testmap.tmx",
-        "E:/coding/Java/Games/Connected/res/testmap/Spawner.tsx",
-        "Wall.tsx"
+        "E:/coding/Java/Games/Connected/res/testmap/Testmap.tmx"
     ],
     "tileset.lastUsedFilter": "Tiled-Kachelsatzdateien (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx",
