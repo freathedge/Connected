@@ -83,7 +83,7 @@ public class Player {
             walkBackFrames[i] = new Image("res/player/walk_back/player_walking_back" + (i + 1) + ".png");
         }
 
-        int duration = 100; // ms per frame
+        int duration = 100;
 
         idleAnimation = new Animation(idleFrames, duration);
         walkFrontAnimation = new Animation(walkFrontFrames, duration);
