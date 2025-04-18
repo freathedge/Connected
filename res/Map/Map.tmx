@@ -9,19 +9,19 @@
  <tileset firstgid="72" source="Water_Middle.tsx"/>
  <tileset firstgid="73" source="Outdoor_Decor_Free.tsx"/>
  <tileset firstgid="157" source="Oak_Tree_Small.tsx"/>
- <layer id="1" name="Floor" width="100" height="100" visible="0">
+ <layer id="1" name="floor.grass" width="100" height="100">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAACu3RMQrAMAwEQfv/n05tSBmiJRnB9OJ2r7U2AAAAAMBD7m76pz/To0WPFj1a9GjRo0WPFj1a9GjRo0WPFj1a9GjRo0WPFj1a9GjRo0WPFj1a9GjRo0WPFj1a9Ggp3/Q2epw3vY0e501vo8d509vocd70Nl9k5xY9WvRo0aNFjxY9WvRo0aNFjxY9WvRo0aNFjxY9WvRo0aNFjxY9WvRo0QMAAAAAAAAAAAAAAAAAgLdczy9rNECcAAA=
   </data>
  </layer>
- <layer id="2" name="Path" width="100" height="100">
+ <layer id="2" name="floor.path" width="100" height="100">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAACu3a0WrCQBRF0aG1VlsR1P//VxMkEAckIsY5MGvBfZJAdHMTMZYCAAAAAPA+X8N8z2bT9nS69zPMdja/bU+ne2OPU9Ejhf3IokcWPbJMPc7ldh/Roy37kWW+H3q0Zz+y6JFFjyxjj+neoUd7fi/J4nqVZd5jvG7p0Zb9yKJHFj2y6JFFjyxTj0vRI4H9yKJHFj2y1D2O5f7/ca2m1//l1T3qOS28/mjOLx7X+57Wv7c/O5cXjtFj2dJ+fGrqvr322A2zX3EO5f5z/n/yuL8133THfH/LokcWPbLokUWPLHpk0SOLHln0yOL5Yxb7kUWPLHpk0SOLHln0yKJHFj2y6JGlfj7vuTgAAAAAAAAAAAAAAAAAAGu5AtdD8YRAnAAA
   </data>
  </layer>
- <layer id="5" name="Nature" width="100" height="100" visible="0">
+ <layer id="5" name="Nature" width="100" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAACu3cS04DMQwA0F4P2ADnYQMrWMGKXhdVqEKFUqbUEzvJewdoLc1MPraTzQYAanvNDmBlt9kBnHCdHUCg++wAgMXusgOY2OhzLl9usgPgwFV2ACt6zw4AgB8q5yGW2GYH0NhDdgCQ4Ck7AOhIq7y3fB2zec4OgKMi6paPAb8BPeo9FxBplFrYS3YAdOOt4X8tmWdH+QYrafmMe2T9V8duPWL+gssZ9wEO2WNwivrWenZ9ob/l7Ec6g7Sm6P6nkfuQGZ/zfhDPdwXH9fJtqG3E0Y/cRpVzqs5dEE1tE8agJxxgTJX7Z9Qogf+KyG3MMAb1kuedReU5eQQtzwOqTdQiNwn9ilqPzXa/2ndL7y6doW/SPa7AnpoXe1H7Be8UQD+q9GieSz7/s/az37uOsIdtmUeeoeYVpVU++a8chbw2cI6lY0av66BKIvf/I4716uR98bygBt8iANCDSvdOqJfAHPThkO3Sd9Dd3gBwuQ903PPEQJwAAA==
+   H4sIAAAAAAAACu3cO04DMRAA0FwPaIDz0EAFFVRwCDgkbLFCgRA2Wa/HHr8npUwy0n5sz4y92wFA256jA9jYdXQAR1xGB1DQbXQAwGI30QEMLPuYy7er6ADYcxEdwIZeowMA4JeW8xBLvEUHUNlddAAQ4CE6AOhIrby3fB2jeYwOgINK1C3vC/wG9Kj3XEBJWWphT9EB0I2Xiv+1ZJzN8gy2pOY17pH5Xzum+YjxC9bz3gfYZ43BMepb25n6Qv/K2Wfag7Sl0v1PmfuQyc9+PyjPcwWH9fJsqG2Uox+5jlb2qdp3QWlqm5CDnnCAnFrun1GjBM5VIrcxwjuolzzvKFoekzOouR9QbaItcpPQr1LzsdHOV/tp6dmlI/RNOscVmKl5MSu1XnBPAfSjlR7NU2XJ579/fT7O/O5U+5nXrhnWsDXzyCPUvEqplU/+L0chrw2cYuk7o9d5UEtKrv8zvuvVyfviekEbPIsAQA9aOnciS70EOE4fDtHW3oPO9gaA9T4Bxb4/0ECcAAA=
   </data>
  </layer>
  <layer id="3" name="wall" width="100" height="100">
