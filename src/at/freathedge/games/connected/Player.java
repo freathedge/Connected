@@ -4,6 +4,9 @@ import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.tiled.TiledMap;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Player {
 
     private float x, y;
@@ -27,6 +30,10 @@ public class Player {
     private long punchCircleStartTime = 0;
     private final int punchCircleDuration = 1000;
 
+    private Map<String, Sound[]> stepSoundsByLayer = new HashMap<>();
+    private long lastStepSoundTime = 0;
+    private int stepSoundIndex = 0;
+
     public enum Direction {
         FRONT, BACK, LEFT, RIGHT
     }
@@ -37,16 +44,12 @@ public class Player {
         this.map = map;
         this.currentDirection = Direction.FRONT;
         loadAnimations();
+        loadStepSounds();
         setDirection(currentDirection);
     }
 
     public void render(Graphics g) {
         currentAnimation.getCurrentFrame().draw(x, y, width, height);
-
-        // Debug hitbox
-//        g.setColor(Color.green);
-//        g.setLineWidth(3);
-//        g.drawRect(x, y, width, height);
 
         if (punchCircleActive) {
             long elapsed = System.currentTimeMillis() - punchCircleStartTime;
@@ -65,8 +68,19 @@ public class Player {
 
     public void update(int delta) {
         currentAnimation.update(delta);
-    }
 
+        long now = System.currentTimeMillis();
+        if (moving && now - lastStepSoundTime >= 500) {
+            String layerName = getCurrentFootstepLayer();
+
+            Sound[] sounds = stepSoundsByLayer.getOrDefault(layerName, stepSoundsByLayer.get("floor.grass"));
+            if (sounds != null && sounds.length > 0) {
+                sounds[stepSoundIndex].play(1.0f, 0.3f);
+                stepSoundIndex = (stepSoundIndex + 1) % sounds.length;
+            }
+            lastStepSoundTime = now;
+        }
+    }
 
     private void loadAnimations() throws SlickException {
         Image[] idleFrames = new Image[6];
@@ -91,7 +105,20 @@ public class Player {
         walkRightAnimation = new Animation(walkRightFrames, duration);
         walkBackAnimation = new Animation(walkBackFrames, duration);
 
-        currentAnimation = idleAnimation; // Default animation
+        currentAnimation = idleAnimation;
+    }
+
+    private void loadStepSounds() throws SlickException {
+        stepSoundsByLayer.put("floor.grass", loadStepSoundsFromPath("res/sounds/player/grass_step/grass_step"));
+        stepSoundsByLayer.put("floor.path", loadStepSoundsFromPath("res/sounds/player/stone_step/stone_step"));
+    }
+
+    private Sound[] loadStepSoundsFromPath(String basePath) throws SlickException {
+        Sound[] sounds = new Sound[6];
+        for (int i = 0; i < 6; i++) {
+            sounds[i] = new Sound(basePath + (i + 1) + ".ogg");
+        }
+        return sounds;
     }
 
     public void setDirection(Direction direction) {
@@ -151,7 +178,7 @@ public class Player {
 
         float currentSpeed = speed;
         int tileSize = map.getTileWidth();
-        int floorLayerIndex = map.getLayerIndex("Floor");
+        int floorLayerIndex = map.getLayerIndex("floor.grass");
         if (floorLayerIndex != -1) {
             int bottomLeftX = (int)(x / tileSize);
             int bottomLeftY = (int)((y + height - 1) / tileSize);
@@ -195,6 +222,30 @@ public class Player {
 
         return false;
     }
+
+    private String getCurrentFootstepLayer() {
+        int tileX = (int)((x + width / 2) / map.getTileWidth());
+        int tileY = (int)((y + height) / map.getTileHeight());
+
+        int grassLayer = map.getLayerIndex("floor.grass");
+        int pathLayer = map.getLayerIndex("floor.path");
+
+        for (int i = 0; i < map.getLayerCount(); i++) {
+            int tileId = map.getTileId(tileX, tileY, i);
+
+            if (tileId != 0) {
+                if (grassLayer == i) {
+                    return "floor.grass";
+                } else if (pathLayer == i) {
+                    return "floor.path";
+                }
+            }
+        }
+
+        return "";
+    }
+
+
 
     public void punch(boolean leftClick) {
         if (leftClick) {

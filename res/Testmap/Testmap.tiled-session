@@ -7,6 +7,7 @@
     "expandedProjectPaths": [
         "."
     ],
+    "file.lastUsedOpenFilter": "Alle Dateien (*)",
     "fileStates": {
         "": {
             "scaleInDock": 1
@@ -24,11 +25,11 @@
             "scaleInEditor": 1
         },
         "E:/coding/Java/Games/Connected/res/Map/Map.tmx": {
-            "scale": 1.5,
-            "selectedLayer": 3,
+            "scale": 0.5,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 481.99999999999994,
-                "y": 483.99999999999994
+                "x": 794,
+                "y": 762
             }
         },
         "E:/coding/Java/Games/Connected/res/Map/Oak_Tree_Small.tsx": {
