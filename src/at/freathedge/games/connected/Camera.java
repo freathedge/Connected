@@ -1,7 +1,13 @@
 package at.freathedge.games.connected;
 
+import at.freathedge.games.connected.ui.UIButton;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Input;
+import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.tiled.TiledMap;
+
+import java.awt.*;
 
 public class Camera {
     private float x, y;
@@ -54,6 +60,31 @@ public class Camera {
     public void zoom(float factor) {
         this.zoomFactor = factor;
     }
+
+    public void drawText(String text, float screenX, float screenY) {
+        java.awt.Font awtFont = new java.awt.Font("Poppins", Font.PLAIN, 20);
+        TrueTypeFont font = new TrueTypeFont(awtFont, false);
+
+        font.drawString(x + screenX, y + screenY, text);
+    }
+
+    public void renderPlayerHealtbar(Graphics g, Player player) {
+        float healthPercentage = (float) player.health() / player.maxHealth();
+        System.out.println("healt" + player.health());
+        System.out.println("Healthpercentage: " + healthPercentage);
+
+        g.setColor(Color.darkGray);
+        g.fillRect(this.x + 10, y + 10, 200, 20);
+
+        g.setColor(Color.red);
+        g.fillRect(this.x + 10, y + 10, 200 * healthPercentage, 20);
+
+        g.setColor(Color.black);
+        g.drawRect(this.x + 10, this.y + 10, 200, 20);
+    }
+
+
+
 
     public float getZoom() {
         return zoomFactor;

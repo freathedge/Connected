@@ -14,6 +14,9 @@ public class Player {
     private final int height = 20;
     private final float speed = 0.1f;
 
+    private final int maxHealth = 100;
+    private int health = 100;
+
     private final TiledMap map;
 
     private Animation idleAnimation;
@@ -33,15 +36,25 @@ public class Player {
 
     private boolean punchCircleActive = false;
     private long punchCircleStartTime = 0;
-    private final int punchCircleDuration = 1000;
+    private final int punchCircleDuration = 400;
 
     private boolean isPunching = false;
+
+    private boolean recentlyDamaged = false;
+    private long damageTimestamp = 0;
+    private final int damageEffectDuration = 150; // in Millisekunden
 
 
 
     private Map<String, Sound[]> stepSoundsByLayer = new HashMap<>();
     private long lastStepSoundTime = 0;
     private int stepSoundIndex = 0;
+
+    private Sound swingSound;
+    private Sound damageSound;
+
+    private long lastDamageSoundTime = 0;
+    private final long damageSoundCooldown = 200; // in Millisekunden
 
     public enum Direction {
         FRONT, BACK, LEFT, RIGHT
@@ -53,26 +66,54 @@ public class Player {
         this.map = map;
         this.currentDirection = Direction.FRONT;
         loadAnimations();
-        loadStepSounds();
+        loadSounds();
         setDirection(currentDirection);
     }
 
     public void render(Graphics g) {
-        currentAnimation.getCurrentFrame().draw(x, y, width, height);
+        long now = System.currentTimeMillis();
+
+        Image frame = currentAnimation.getCurrentFrame();
+
+        if (recentlyDamaged && now - damageTimestamp <= damageEffectDuration) {
+            frame.draw(x, y, width, height, new Color(255, 0, 0));
+        } else {
+            recentlyDamaged = false;
+            frame.draw(x, y, width, height);
+        }
+
 
         if (punchCircleActive) {
             long elapsed = System.currentTimeMillis() - punchCircleStartTime;
             if (elapsed <= punchCircleDuration) {
                 float centerX = x + width / 2f;
                 float centerY = y + height / 2f;
-                float radius = 75f;
+                float radius = 25f;
 
                 g.setColor(new Color(255, 0, 0, 100));
-                g.drawOval(centerX - radius, centerY - radius, radius * 2, radius * 2);
+
+                float startAngle = 0f;
+                switch (currentDirection) {
+                    case FRONT: // unten
+                        startAngle = 0f;
+                        break;
+                    case RIGHT:
+                        startAngle = 270f;
+                        break;
+                    case BACK: // oben
+                        startAngle = 180f;
+                        break;
+                    case LEFT:
+                        startAngle = 90f;
+                        break;
+                }
+
+                g.fillArc(centerX - radius, centerY - radius, radius * 2, radius * 2, startAngle, startAngle + 180f);
             } else {
                 punchCircleActive = false;
             }
         }
+
     }
 
     public void update(int delta) {
@@ -113,22 +154,22 @@ public class Player {
 
         moving = (dx != 0 || dy != 0);
 
-        if (!moving) {
-            setDirection(Direction.FRONT);
-        } else {
-            if (dx != 0 && dy != 0) {
-                float length = (float) Math.sqrt(dx * dx + dy * dy);
-                dx /= length;
-                dy /= length;
+        if (!isPunching) {
+            if (!moving) {
+                setDirection(Direction.FRONT);
+            } else {
+                if (dx != 0 && dy != 0) {
+                    float length = (float) Math.sqrt(dx * dx + dy * dy);
+                    dx /= length;
+                    dy /= length;
+                }
+
+                if (dy < 0) setDirection(Direction.BACK);
+                else if (dy > 0) setDirection(Direction.FRONT);
+                else if (dx < 0) setDirection(Direction.LEFT);
+                else setDirection(Direction.RIGHT);
             }
-
-            if (dy < 0) setDirection(Direction.BACK);
-            else if (dy > 0) setDirection(Direction.FRONT);
-            else if (dx < 0) setDirection(Direction.LEFT);
-            else setDirection(Direction.RIGHT);
         }
-
-        //updateAnimation();
 
         float currentSpeed = speed;
         int tileSize = map.getTileWidth();
@@ -160,6 +201,8 @@ public class Player {
             punchCircleActive = true;
             punchCircleStartTime = System.currentTimeMillis();
             isPunching = true;
+            swingSound.stop();
+            swingSound.play(1.0f, 1.5f);
 
             switch (currentDirection) {
                 case FRONT:
@@ -177,7 +220,6 @@ public class Player {
             }
         }
     }
-
 
     private void loadAnimations() throws SlickException {
         Image[] idleFrames = new Image[6];
@@ -222,9 +264,13 @@ public class Player {
         currentAnimation = idleAnimation;
     }
 
-    private void loadStepSounds() throws SlickException {
+    private void loadSounds() throws SlickException {
         stepSoundsByLayer.put("floor.grass", loadStepSoundsFromPath("res/sounds/player/grass_step/grass_step"));
         stepSoundsByLayer.put("floor.path", loadStepSoundsFromPath("res/sounds/player/stone_step/stone_step"));
+
+        swingSound = new Sound("res/sounds/player/sword_swing.ogg");
+
+        damageSound = new Sound("res/sounds/player/player_damage.ogg");
     }
 
     private Sound[] loadStepSoundsFromPath(String basePath) throws SlickException {
@@ -311,10 +357,41 @@ public class Player {
         return "";
     }
 
+    public void damage(int damage) {
+        this.health -= damage;
+        recentlyDamaged = true;
+        damageTimestamp = System.currentTimeMillis();
+
+        long now = System.currentTimeMillis();
+        if (now - lastDamageSoundTime >= damageSoundCooldown) {
+            damageSound.stop();
+            damageSound.play(1.0f, 0.5f);
+            lastDamageSoundTime = now;
+        }
+
+        checkDeath();
+    }
+
+    public void checkDeath() {
+        if(health <= 0) {
+
+        }
+    }
+
+
+
     public float getX() { return x; }
     public float getY() { return y; }
     public int getWidth() { return width; }
     public int getHeight() { return height; }
+
+    public int maxHealth() {
+        return maxHealth;
+    }
+
+    public int health() {
+        return health;
+    }
 
     public void setPosition(float x, float y) { this.x = x; this.y = y; }
     public void setX(float x) { this.x = x; }

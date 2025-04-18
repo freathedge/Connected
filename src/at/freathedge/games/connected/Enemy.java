@@ -7,48 +7,62 @@ import org.newdawn.slick.tiled.TiledMap;
 public class Enemy {
 
     private float x, y;
-    private float speed = 0.1f;
+    private float width, height;
+    private float speed = 0.05f;
     private Player player;
     private TiledMap map;
     private Image image;
     private Rectangle hitbox;
 
-    public Enemy(float x, float y, Player player, TiledMap map) throws SlickException {
+    private int attackCooldown = 3000; // in Millisekunden
+    private int timeSinceLastAttack = 0;
+
+    private int damage;
+    private int damageRadius = 15;
+
+
+    public Enemy(float x, float y, Player player, TiledMap map, int damage) throws SlickException {
         this.x = x;
         this.y = y;
         this.player = player;
         this.map = map;
+        this.width = 13;
+        this.height = 20;
         this.image = new Image("res/enemy/enemy.png");
-        this.hitbox = new Rectangle(x, y, image.getWidth(), image.getHeight());
+        this.hitbox = new Rectangle(x, y, width, height);
+        this.damage = damage;
     }
 
     public void update(int delta) {
         float dx = player.getX() - x;
         float dy = player.getY() - y;
 
-        // Berechne die Richtung
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
-        if (distance > 1) {
-            // Normalisiere die Richtung
+        if (distance > damageRadius - 5) {
             dx /= distance;
             dy /= distance;
 
-            // Berechne die neue Position
             float newX = x + dx * speed * delta;
             float newY = y + dy * speed * delta;
 
-            // Überprüfe auf Kollision mit der Wand
             if (!checkCollision(newX, y)) {
-                x = newX; // nur bewegen, wenn keine Kollision mit Wänden
+                x = newX;
             }
             if (!checkCollision(x, newY)) {
-                y = newY; // nur bewegen, wenn keine Kollision mit Wänden
+                y = newY;
             }
         }
 
-        // Update der Hitbox
         hitbox.setX(x);
         hitbox.setY(y);
+
+        timeSinceLastAttack += delta;
+
+
+        float playerDistance = (float) Math.sqrt((player.getX() - x) * (player.getX() - x) + (player.getY() - y) * (player.getY() - y));
+        if (playerDistance < damageRadius) {
+            punch();
+        }
     }
 
     private boolean checkCollision(float newX, float newY) {
@@ -59,18 +73,25 @@ public class Enemy {
             return true;
         }
 
-        int tileID = map.getTileId(tileX, tileY, 1); // Layer 1 (Wall-Layer)
-        if (tileID != 0) {
-            return true;
-        }
+        int layer = map.getLayerIndex("wall");
+        int tileID = map.getTileId(tileX, tileY, layer); // Layer 1 (Wall-Layer)
+        return tileID != 0;
+    }
 
-        return false;
+    public void punch() {
+
+        if (timeSinceLastAttack >= attackCooldown) {
+
+            System.out.println("punch");
+            player.damage(damage);
+            timeSinceLastAttack = 0;
+        }
     }
 
     public void render(Graphics g) {
-        image.draw(x, y);
+        image.draw(x, y, width, height);
         g.setColor(Color.red);
-        g.drawRect(x, y, image.getWidth(), image.getHeight());
+        g.drawRect(x, y, width, height);
     }
 
     public Rectangle getHitbox() {

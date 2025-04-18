@@ -34,20 +34,22 @@ public class Connected extends BasicGame {
 
         java.awt.Font awtFont = new java.awt.Font("Verdana", java.awt.Font.BOLD, 24);
         TrueTypeFont font = new TrueTypeFont(awtFont, false);
-        quitButton = new UIButton(gc, (float) (gc.getWidth() - 200) / 2, (float) (gc.getHeight() - 150) / 2, 200, 50, "Spiel beenden", font);
-        resumeButton = new UIButton(gc, (float) (gc.getWidth() - 200) / 2, (float) (gc.getHeight() - 250) / 2, 200, 50, "Fortsetzen", font);
+        quitButton = new UIButton((float) (gc.getWidth() - 200) / 2, (float) (gc.getHeight() - 150) / 2, 200, 50, "Spiel beenden", font);
+        resumeButton = new UIButton((float) (gc.getWidth() - 200) / 2, (float) (gc.getHeight() - 250) / 2, 200, 50, "Fortsetzen", font);
 
-//        int spawnerLayerIndex = map.getLayerIndex("spawner.enemy");
-//        for (int x = 0; x < map.getWidth(); x++) {
-//            for (int y = 0; y < map.getHeight(); y++) {
-//                int tileId = map.getTileId(x, y, spawnerLayerIndex);
-//                if (tileId != 0) {
-//                    float worldX = x * map.getTileWidth();
-//                    float worldY = y * map.getTileHeight();
-//                    spawners.add(new EnemySpawner(worldX, worldY));
-//                }
-//            }
-//        }
+        int spawnerLayerIndex = map.getLayerIndex("spawner.enemy");
+        for (int x = 0; x < map.getWidth(); x++) {
+            for (int y = 0; y < map.getHeight(); y++) {
+                int tileId = map.getTileId(x, y, spawnerLayerIndex);
+                if (tileId != 0) {
+                    float worldX = x * map.getTileWidth();
+                    float worldY = y * map.getTileHeight();
+                    spawners.add(new EnemySpawner(worldX, worldY));
+                }
+            }
+        }
+
+
     }
 
     @Override
@@ -75,6 +77,10 @@ public class Connected extends BasicGame {
         boolean right = input.isKeyDown(Input.KEY_D);
         boolean leftClick = input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON);
 
+        if(input.isKeyDown(Input.KEY_SPACE)) {
+            player.damage(5);
+        }
+
         player.move(delta, up, down, left, right);
         player.punch(leftClick);
         player.update(delta);
@@ -90,12 +96,15 @@ public class Connected extends BasicGame {
         for (Enemy enemy : enemies) {
             enemy.update(delta);
         }
+
     }
 
     @Override
     public void render(GameContainer gc, Graphics g) throws SlickException {
 
+
         camera.apply(g);
+
 
         for (int i = 0; i < map.getLayerCount(); i++) {
             map.render(0, 0, i);
@@ -107,6 +116,9 @@ public class Connected extends BasicGame {
             enemy.render(g);
         }
 
+        //camera.drawText("Test", 10, 10);
+        camera.renderPlayerHealtbar(g, player);
+
 
         if (paused) {
             g.setColor(new Color(0, 0, 0, 0.5f));
@@ -117,6 +129,8 @@ public class Connected extends BasicGame {
             quitButton.render(g, gc.getInput());
             resumeButton.render(g, gc.getInput());
         }
+
+
     }
 
 

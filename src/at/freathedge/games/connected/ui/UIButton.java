@@ -7,7 +7,7 @@ import org.newdawn.slick.geom.Rectangle;
 
 public class UIButton {
 
-    GameContainer gc;
+
 
     private Rectangle bounds;
     private String label;
@@ -18,8 +18,7 @@ public class UIButton {
     private Color textColor = Color.white;
     private Color borderColor = new Color(255, 255, 255, 100);
 
-    public UIButton(GameContainer gc, float x, float y, float width, float height, String label, Font font) {
-        this.gc = gc;
+    public UIButton(float x, float y, float width, float height, String label, Font font) {
         this.bounds = new Rectangle(x, y, width, height);
         this.label = label;
         this.font = font;
@@ -28,15 +27,12 @@ public class UIButton {
     public void render(Graphics g, Input input) throws SlickException {
         boolean hovered = bounds.contains(input.getMouseX(), input.getMouseY());
 
-        // Hintergrund
         g.setColor(hovered ? hoverColor : backgroundColor);
         g.fill(bounds);
 
-        // Rahmen
         g.setColor(borderColor);
         g.draw(bounds);
 
-        // Text
         g.setColor(textColor);
         float textX = bounds.getX() + (bounds.getWidth() - font.getWidth(label)) / 2f;
         float textY = bounds.getY() + (bounds.getHeight() - font.getHeight(label)) / 2f;
