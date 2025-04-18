@@ -12,7 +12,7 @@ public class Player {
     private float x, y;
     private final int width = 13;
     private final int height = 20;
-    private final float speed = 0.2f;
+    private final float speed = 0.1f;
 
     private final TiledMap map;
 
@@ -23,12 +23,21 @@ public class Player {
     private Animation walkBackAnimation;
     private Animation currentAnimation;
 
+    private Animation punchFrontAnimation;
+    private Animation punchLeftAnimation;
+    private Animation punchRightAnimation;
+    private Animation punchBackAnimation;
+
     private Direction currentDirection;
     private boolean moving = false;
 
     private boolean punchCircleActive = false;
     private long punchCircleStartTime = 0;
     private final int punchCircleDuration = 1000;
+
+    private boolean isPunching = false;
+
+
 
     private Map<String, Sound[]> stepSoundsByLayer = new HashMap<>();
     private long lastStepSoundTime = 0;
@@ -67,7 +76,17 @@ public class Player {
     }
 
     public void update(int delta) {
-        currentAnimation.update(delta);
+        if (isPunching) {
+            currentAnimation.update(delta);
+
+            if (currentAnimation.getFrame() == currentAnimation.getFrameCount() - 1) {
+                isPunching = false;
+                updateAnimation();
+            }
+        } else {
+            currentAnimation.update(delta);
+        }
+
 
         long now = System.currentTimeMillis();
         if (moving && now - lastStepSoundTime >= 500) {
@@ -79,71 +98,6 @@ public class Player {
                 stepSoundIndex = (stepSoundIndex + 1) % sounds.length;
             }
             lastStepSoundTime = now;
-        }
-    }
-
-    private void loadAnimations() throws SlickException {
-        Image[] idleFrames = new Image[6];
-        Image[] walkFrontFrames = new Image[6];
-        Image[] walkLeftFrames = new Image[6];
-        Image[] walkRightFrames = new Image[6];
-        Image[] walkBackFrames = new Image[6];
-
-        for (int i = 0; i < 6; i++) {
-            idleFrames[i] = new Image("res/player/idle/player_idle" + (i + 1) + ".png");
-            walkFrontFrames[i] = new Image("res/player/walk_front/player_walking_front" + (i + 1) + ".png");
-            walkLeftFrames[i] = new Image("res/player/walk_left/player_walking_left" + (i + 1) + ".png");
-            walkRightFrames[i] = new Image("res/player/walk_right/player_walking_right" + (i + 1) + ".png");
-            walkBackFrames[i] = new Image("res/player/walk_back/player_walking_back" + (i + 1) + ".png");
-        }
-
-        int duration = 100;
-
-        idleAnimation = new Animation(idleFrames, duration);
-        walkFrontAnimation = new Animation(walkFrontFrames, duration);
-        walkLeftAnimation = new Animation(walkLeftFrames, duration);
-        walkRightAnimation = new Animation(walkRightFrames, duration);
-        walkBackAnimation = new Animation(walkBackFrames, duration);
-
-        currentAnimation = idleAnimation;
-    }
-
-    private void loadStepSounds() throws SlickException {
-        stepSoundsByLayer.put("floor.grass", loadStepSoundsFromPath("res/sounds/player/grass_step/grass_step"));
-        stepSoundsByLayer.put("floor.path", loadStepSoundsFromPath("res/sounds/player/stone_step/stone_step"));
-    }
-
-    private Sound[] loadStepSoundsFromPath(String basePath) throws SlickException {
-        Sound[] sounds = new Sound[6];
-        for (int i = 0; i < 6; i++) {
-            sounds[i] = new Sound(basePath + (i + 1) + ".ogg");
-        }
-        return sounds;
-    }
-
-    public void setDirection(Direction direction) {
-        this.currentDirection = direction;
-        updateAnimation();
-    }
-
-    private void updateAnimation() {
-        if (moving) {
-            switch (currentDirection) {
-                case FRONT:
-                    currentAnimation = walkFrontAnimation;
-                    break;
-                case LEFT:
-                    currentAnimation = walkLeftAnimation;
-                    break;
-                case RIGHT:
-                    currentAnimation = walkRightAnimation;
-                    break;
-                case BACK:
-                    currentAnimation = walkBackAnimation;
-                    break;
-            }
-        } else {
-            currentAnimation = idleAnimation;
         }
     }
 
@@ -174,7 +128,7 @@ public class Player {
             else setDirection(Direction.RIGHT);
         }
 
-        updateAnimation();
+        //updateAnimation();
 
         float currentSpeed = speed;
         int tileSize = map.getTileWidth();
@@ -197,6 +151,117 @@ public class Player {
 
         if (!isBlocked(nextX, y)) x = nextX;
         if (!isBlocked(x, nextY)) y = nextY;
+    }
+
+    public void punch(boolean leftClick) {
+
+        if (leftClick && !isPunching) {
+
+            punchCircleActive = true;
+            punchCircleStartTime = System.currentTimeMillis();
+            isPunching = true;
+
+            switch (currentDirection) {
+                case FRONT:
+                    currentAnimation = punchFrontAnimation;
+                    break;
+                case LEFT:
+                    currentAnimation = punchLeftAnimation;
+                    break;
+                case RIGHT:
+                    currentAnimation = punchRightAnimation;
+                    break;
+                case BACK:
+                    currentAnimation = punchBackAnimation;
+                    break;
+            }
+        }
+    }
+
+
+    private void loadAnimations() throws SlickException {
+        Image[] idleFrames = new Image[6];
+        Image[] walkFrontFrames = new Image[6];
+        Image[] walkLeftFrames = new Image[6];
+        Image[] walkRightFrames = new Image[6];
+        Image[] walkBackFrames = new Image[6];
+
+        Image[] punchFrontFrames = new Image[4];
+        Image[] punchLeftFrames = new Image[4];
+        Image[] punchRightFrames = new Image[4];
+        Image[] punchBackFrames = new Image[4];
+
+        for (int i = 0; i < 6; i++) {
+            idleFrames[i] = new Image("res/player/idle/player_idle" + (i + 1) + ".png");
+            walkFrontFrames[i] = new Image("res/player/walk_front/player_walking_front" + (i + 1) + ".png");
+            walkLeftFrames[i] = new Image("res/player/walk_left/player_walking_left" + (i + 1) + ".png");
+            walkRightFrames[i] = new Image("res/player/walk_right/player_walking_right" + (i + 1) + ".png");
+            walkBackFrames[i] = new Image("res/player/walk_back/player_walking_back" + (i + 1) + ".png");
+        }
+
+        for (int i = 0; i < 4; i++) {
+            punchFrontFrames[i] = new Image("res/player/swing_front/swing_front" + (i + 1) + ".png");
+            punchLeftFrames[i] = new Image("res/player/swing_left/swing_left" + (i + 1) + ".png");
+            punchRightFrames[i] = new Image("res/player/swing_right/swing_right" + (i + 1) + ".png");
+            punchBackFrames[i] = new Image("res/player/swing_back/swing_back" + (i + 1) + ".png");
+        }
+
+        int duration = 100;
+
+        idleAnimation = new Animation(idleFrames, duration);
+        walkFrontAnimation = new Animation(walkFrontFrames, duration);
+        walkLeftAnimation = new Animation(walkLeftFrames, duration);
+        walkRightAnimation = new Animation(walkRightFrames, duration);
+        walkBackAnimation = new Animation(walkBackFrames, duration);
+
+        punchFrontAnimation = new Animation(punchFrontFrames, duration);
+        punchLeftAnimation = new Animation(punchLeftFrames, duration);
+        punchRightAnimation = new Animation(punchRightFrames, duration);
+        punchBackAnimation = new Animation(punchBackFrames, duration);
+
+        currentAnimation = idleAnimation;
+    }
+
+    private void loadStepSounds() throws SlickException {
+        stepSoundsByLayer.put("floor.grass", loadStepSoundsFromPath("res/sounds/player/grass_step/grass_step"));
+        stepSoundsByLayer.put("floor.path", loadStepSoundsFromPath("res/sounds/player/stone_step/stone_step"));
+    }
+
+    private Sound[] loadStepSoundsFromPath(String basePath) throws SlickException {
+        Sound[] sounds = new Sound[6];
+        for (int i = 0; i < 6; i++) {
+            sounds[i] = new Sound(basePath + (i + 1) + ".ogg");
+        }
+        return sounds;
+    }
+
+    public void setDirection(Direction direction) {
+        this.currentDirection = direction;
+        updateAnimation();
+    }
+
+    private void updateAnimation() {
+        if(isPunching) {
+            return;
+        }
+        if (moving) {
+            switch (currentDirection) {
+                case FRONT:
+                    currentAnimation = walkFrontAnimation;
+                    break;
+                case LEFT:
+                    currentAnimation = walkLeftAnimation;
+                    break;
+                case RIGHT:
+                    currentAnimation = walkRightAnimation;
+                    break;
+                case BACK:
+                    currentAnimation = walkBackAnimation;
+                    break;
+            }
+        } else {
+            currentAnimation = idleAnimation;
+        }
     }
 
     private boolean isBlocked(float x, float y) {
@@ -234,24 +299,16 @@ public class Player {
             int tileId = map.getTileId(tileX, tileY, i);
 
             if (tileId != 0) {
-                if (grassLayer == i) {
+                if (i == grassLayer) {
                     return "floor.grass";
-                } else if (pathLayer == i) {
+                } else if (i == pathLayer) {
                     return "floor.path";
                 }
+
             }
         }
 
         return "";
-    }
-
-
-
-    public void punch(boolean leftClick) {
-        if (leftClick) {
-            punchCircleActive = true;
-            punchCircleStartTime = System.currentTimeMillis();
-        }
     }
 
     public float getX() { return x; }
