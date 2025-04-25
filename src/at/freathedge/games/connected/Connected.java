@@ -5,6 +5,7 @@ import at.freathedge.games.connected.ui.UIButton;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,11 +27,11 @@ public class Connected extends BasicGame {
 
     @Override
     public void init(GameContainer gc) throws SlickException {
-        map = new TiledMap("res/Map/Map.tmx", "res/Map");
+        map = new TiledMap("res/Map2/Map.tmx", "res/Map2");
         player = new Player((float) (map.getWidth() * map.getTileWidth()) / 2, (float) (map.getHeight() * map.getTileHeight()) / 2, map);
         camera = new Camera();
         camera.setMap(map);
-        camera.zoom(2f);
+        camera.zoom(3.5f); //default: 3.5f
 
         java.awt.Font awtFont = new java.awt.Font("Verdana", java.awt.Font.BOLD, 24);
         TrueTypeFont font = new TrueTypeFont(awtFont, false);
@@ -38,16 +39,19 @@ public class Connected extends BasicGame {
         resumeButton = new UIButton((float) (gc.getWidth() - 200) / 2, (float) (gc.getHeight() - 250) / 2, 200, 50, "Fortsetzen", font);
 
         int spawnerLayerIndex = map.getLayerIndex("spawner.enemy");
-        for (int x = 0; x < map.getWidth(); x++) {
-            for (int y = 0; y < map.getHeight(); y++) {
-                int tileId = map.getTileId(x, y, spawnerLayerIndex);
-                if (tileId != 0) {
-                    float worldX = x * map.getTileWidth();
-                    float worldY = y * map.getTileHeight();
-                    spawners.add(new EnemySpawner(worldX, worldY));
+        if(spawnerLayerIndex != -1) {
+            for (int x = 0; x < map.getWidth(); x++) {
+                for (int y = 0; y < map.getHeight(); y++) {
+                    int tileId = map.getTileId(x, y, spawnerLayerIndex);
+                    if (tileId != 0) {
+                        float worldX = x * map.getTileWidth();
+                        float worldY = y * map.getTileHeight();
+                        spawners.add(new EnemySpawner(worldX, worldY));
+                    }
                 }
             }
         }
+
 
 
     }
@@ -82,7 +86,14 @@ public class Connected extends BasicGame {
         }
 
         player.move(delta, up, down, left, right);
-        player.punch(leftClick);
+        if (leftClick) {
+            float mouseScreenX = input.getMouseX();
+            float mouseScreenY = input.getMouseY();
+            float mouseWorldX  = camera.getX() + mouseScreenX / camera.getZoom();
+            float mouseWorldY  = camera.getY() + mouseScreenY / camera.getZoom();
+            player.punch(leftClick, mouseWorldX, mouseWorldY);
+        }
+
         player.update(delta);
         camera.update(player.getX(), player.getY(), gc.getWidth(), gc.getHeight(), delta);
 
@@ -110,7 +121,12 @@ public class Connected extends BasicGame {
             map.render(0, 0, i);
         }
 
-        player.render(g);
+
+        float mouseScreenX = gc.getInput().getMouseX();
+        float mouseScreenY = gc.getInput().getMouseY();
+        float mouseWorldX  = camera.getX() + mouseScreenX / camera.getZoom();
+        float mouseWorldY  = camera.getY() + mouseScreenY / camera.getZoom();
+        player.render(g, mouseWorldX, mouseWorldY);
 
         for (Enemy enemy : enemies) {
             enemy.render(g);
@@ -138,6 +154,7 @@ public class Connected extends BasicGame {
         try {
             AppGameContainer container = new AppGameContainer(new Connected("Connected"));
             container.setDisplayMode(1920, 1080, true);
+            container.setIcon("res/icon.png");
             container.setShowFPS(false);
             container.start();
         } catch (SlickException e) {

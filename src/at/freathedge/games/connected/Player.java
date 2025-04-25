@@ -32,19 +32,18 @@ public class Player {
     private Animation punchBackAnimation;
 
     private Direction currentDirection;
+    private Direction punchDirection;
+
     private boolean moving = false;
 
-    private boolean punchCircleActive = false;
-    private long punchCircleStartTime = 0;
-    private final int punchCircleDuration = 400;
+    private float punchCirlceRadius = 25;
+    private float punchCircleAngle = 150f;
 
     private boolean isPunching = false;
 
     private boolean recentlyDamaged = false;
     private long damageTimestamp = 0;
     private final int damageEffectDuration = 150; // in Millisekunden
-
-
 
     private Map<String, Sound[]> stepSoundsByLayer = new HashMap<>();
     private long lastStepSoundTime = 0;
@@ -54,7 +53,6 @@ public class Player {
     private Sound damageSound;
 
     private long lastDamageSoundTime = 0;
-    private final long damageSoundCooldown = 200; // in Millisekunden
 
     public enum Direction {
         FRONT, BACK, LEFT, RIGHT
@@ -68,50 +66,44 @@ public class Player {
         loadAnimations();
         loadSounds();
         setDirection(currentDirection);
+        this.punchDirection = currentDirection;
     }
 
-    public void render(Graphics g) {
-        long now = System.currentTimeMillis();
-
-        Image frame = currentAnimation.getCurrentFrame();
-
-        if (recentlyDamaged && now - damageTimestamp <= damageEffectDuration) {
-            frame.draw(x, y, width, height, new Color(255, 0, 0));
+    public void render(Graphics g, float mouseWorldX, float mouseWorldY) {
+        // Zeichne Spieler
+        if (recentlyDamaged && System.currentTimeMillis() - damageTimestamp <= damageEffectDuration) {
+            currentAnimation.getCurrentFrame().draw(x, y, width, height, new Color(255, 0, 0));
         } else {
-            recentlyDamaged = false;
-            frame.draw(x, y, width, height);
+            currentAnimation.getCurrentFrame().draw(x, y, width, height);
         }
 
+        float centerX = x + width / 2f;
+        float centerY = y + height / 2f;
+        float dx = mouseWorldX - centerX;
+        float dy = mouseWorldY - centerY;
 
-        if (punchCircleActive) {
-            long elapsed = System.currentTimeMillis() - punchCircleStartTime;
-            if (elapsed <= punchCircleDuration) {
-                float centerX = x + width / 2f;
-                float centerY = y + height / 2f;
-                float radius = 25f;
+        // Winkel berechnen (atan2: 0 = Ost, CCW positiv)
+        double theta = Math.toDegrees(Math.atan2(dy, dx));
+        // Für Slick: 0° = Süden, im Uhrzeigersinn steigend
+        float startAngle = (float) ((theta + 270) % 360);
 
-                g.setColor(new Color(255, 0, 0, 100));
-
-                float startAngle = 0f;
-                switch (currentDirection) {
-                    case FRONT: // unten
-                        startAngle = 0f;
-                        break;
-                    case RIGHT:
-                        startAngle = 270f;
-                        break;
-                    case BACK: // oben
-                        startAngle = 180f;
-                        break;
-                    case LEFT:
-                        startAngle = 90f;
-                        break;
-                }
-
-                g.fillArc(centerX - radius, centerY - radius, radius * 2, radius * 2, startAngle, startAngle + 180f);
-            } else {
-                punchCircleActive = false;
-            }
+        if (isPunching) {
+            g.setColor(new Color(255, 0, 0, 100));
+            // gefüllter Halbkreis
+            g.fillArc(
+                    centerX - punchCirlceRadius, centerY - punchCirlceRadius,
+                    50, 50,
+                    startAngle,
+                    startAngle + punchCircleAngle
+            );
+        } else {
+            g.setColor(new Color(255, 255, 255));
+            g.drawArc(
+                    centerX - punchCirlceRadius, centerY - punchCirlceRadius,
+                    50, 50,
+                    startAngle,
+                    startAngle + punchCircleAngle
+            );
         }
 
     }
@@ -119,7 +111,6 @@ public class Player {
     public void update(int delta) {
         if (isPunching) {
             currentAnimation.update(delta);
-
             if (currentAnimation.getFrame() == currentAnimation.getFrameCount() - 1) {
                 isPunching = false;
                 updateAnimation();
@@ -128,11 +119,9 @@ public class Player {
             currentAnimation.update(delta);
         }
 
-
         long now = System.currentTimeMillis();
         if (moving && now - lastStepSoundTime >= 500) {
             String layerName = getCurrentFootstepLayer();
-
             Sound[] sounds = stepSoundsByLayer.getOrDefault(layerName, stepSoundsByLayer.get("floor.grass"));
             if (sounds != null && sounds.length > 0) {
                 sounds[stepSoundIndex].play(1.0f, 0.3f);
@@ -143,12 +132,9 @@ public class Player {
     }
 
     public void move(float delta, boolean up, boolean down, boolean left, boolean right) throws SlickException {
-        float dx = 0;
-        float dy = 0;
-
+        float dx = 0, dy = 0;
         if (left) dx -= 1;
         else if (right) dx += 1;
-
         if (up) dy -= 1;
         else if (down) dy += 1;
 
@@ -159,11 +145,10 @@ public class Player {
                 setDirection(Direction.FRONT);
             } else {
                 if (dx != 0 && dy != 0) {
-                    float length = (float) Math.sqrt(dx * dx + dy * dy);
-                    dx /= length;
-                    dy /= length;
+                    float len = (float) Math.sqrt(dx * dx + dy * dy);
+                    dx /= len;
+                    dy /= len;
                 }
-
                 if (dy < 0) setDirection(Direction.BACK);
                 else if (dy > 0) setDirection(Direction.FRONT);
                 else if (dx < 0) setDirection(Direction.LEFT);
@@ -173,38 +158,46 @@ public class Player {
 
         float currentSpeed = speed;
         int tileSize = map.getTileWidth();
-        int floorLayerIndex = map.getLayerIndex("floor.grass");
-        if (floorLayerIndex != -1) {
-            int bottomLeftX = (int)(x / tileSize);
-            int bottomLeftY = (int)((y + height - 1) / tileSize);
-            int bottomRightX = (int)((x + width - 1) / tileSize);
-            int bottomRightY = bottomLeftY;
-            int leftTileID = map.getTileId(bottomLeftX, bottomLeftY, floorLayerIndex);
-            int rightTileID = map.getTileId(bottomRightX, bottomRightY, floorLayerIndex);
-            if (leftTileID != 0 || rightTileID != 0) {
+        int grassLayer = map.getLayerIndex("floor.grass");
+        if (grassLayer != -1) {
+            int bx = (int) (x / tileSize);
+            int by = (int) ((y + height - 1) / tileSize);
+            int leftTile = map.getTileId(bx, by, grassLayer);
+            int rightTile = map.getTileId((int) ((x + width - 1) / tileSize), by, grassLayer);
+            if (leftTile != 0 || rightTile != 0) {
                 currentSpeed *= 0.6f;
             }
         }
 
-        float playerSpeed = currentSpeed * delta;
-        float nextX = x + dx * playerSpeed;
-        float nextY = y + dy * playerSpeed;
-
-        if (!isBlocked(nextX, y)) x = nextX;
-        if (!isBlocked(x, nextY)) y = nextY;
+        float step = currentSpeed * delta;
+        float nx = x + dx * step;
+        float ny = y + dy * step;
+        if (!isBlocked(nx, y)) x = nx;
+        if (!isBlocked(x, ny)) y = ny;
     }
 
-    public void punch(boolean leftClick) {
-
+    public void punch(boolean leftClick, float mouseWorldX, float mouseWorldY) {
         if (leftClick && !isPunching) {
+            float centerX = x + width / 2f;
+            float centerY = y + height / 2f;
+            float dx = mouseWorldX - centerX;
+            float dy = mouseWorldY - centerY;
 
-            punchCircleActive = true;
-            punchCircleStartTime = System.currentTimeMillis();
+            Direction punchDir;
+            if (Math.abs(dx) > Math.abs(dy)) {
+                punchDir = dx > 0 ? Direction.RIGHT : Direction.LEFT;
+            } else {
+                punchDir = dy > 0 ? Direction.FRONT : Direction.BACK;
+            }
+
+            punchDirection = punchDir;
+            setDirection(punchDir);
+
             isPunching = true;
             swingSound.stop();
             swingSound.play(1.0f, 1.5f);
 
-            switch (currentDirection) {
+            switch (punchDir) {
                 case FRONT:
                     currentAnimation = punchFrontAnimation;
                     break;
@@ -227,7 +220,6 @@ public class Player {
         Image[] walkLeftFrames = new Image[6];
         Image[] walkRightFrames = new Image[6];
         Image[] walkBackFrames = new Image[6];
-
         Image[] punchFrontFrames = new Image[4];
         Image[] punchLeftFrames = new Image[4];
         Image[] punchRightFrames = new Image[4];
@@ -240,7 +232,6 @@ public class Player {
             walkRightFrames[i] = new Image("res/player/walk_right/player_walking_right" + (i + 1) + ".png");
             walkBackFrames[i] = new Image("res/player/walk_back/player_walking_back" + (i + 1) + ".png");
         }
-
         for (int i = 0; i < 4; i++) {
             punchFrontFrames[i] = new Image("res/player/swing_front/swing_front" + (i + 1) + ".png");
             punchLeftFrames[i] = new Image("res/player/swing_left/swing_left" + (i + 1) + ".png");
@@ -248,18 +239,17 @@ public class Player {
             punchBackFrames[i] = new Image("res/player/swing_back/swing_back" + (i + 1) + ".png");
         }
 
-        int duration = 100;
+        int frameDuration = 100;
+        idleAnimation = new Animation(idleFrames, frameDuration);
+        walkFrontAnimation = new Animation(walkFrontFrames, frameDuration);
+        walkLeftAnimation = new Animation(walkLeftFrames, frameDuration);
+        walkRightAnimation = new Animation(walkRightFrames, frameDuration);
+        walkBackAnimation = new Animation(walkBackFrames, frameDuration);
 
-        idleAnimation = new Animation(idleFrames, duration);
-        walkFrontAnimation = new Animation(walkFrontFrames, duration);
-        walkLeftAnimation = new Animation(walkLeftFrames, duration);
-        walkRightAnimation = new Animation(walkRightFrames, duration);
-        walkBackAnimation = new Animation(walkBackFrames, duration);
-
-        punchFrontAnimation = new Animation(punchFrontFrames, duration);
-        punchLeftAnimation = new Animation(punchLeftFrames, duration);
-        punchRightAnimation = new Animation(punchRightFrames, duration);
-        punchBackAnimation = new Animation(punchBackFrames, duration);
+        punchFrontAnimation = new Animation(punchFrontFrames, frameDuration);
+        punchLeftAnimation = new Animation(punchLeftFrames, frameDuration);
+        punchRightAnimation = new Animation(punchRightFrames, frameDuration);
+        punchBackAnimation = new Animation(punchBackFrames, frameDuration);
 
         currentAnimation = idleAnimation;
     }
@@ -269,7 +259,6 @@ public class Player {
         stepSoundsByLayer.put("floor.path", loadStepSoundsFromPath("res/sounds/player/stone_step/stone_step"));
 
         swingSound = new Sound("res/sounds/player/sword_swing.ogg");
-
         damageSound = new Sound("res/sounds/player/player_damage.ogg");
     }
 
@@ -287,9 +276,8 @@ public class Player {
     }
 
     private void updateAnimation() {
-        if(isPunching) {
-            return;
-        }
+        if (isPunching) return;
+
         if (moving) {
             switch (currentDirection) {
                 case FRONT:
@@ -312,49 +300,42 @@ public class Player {
 
     private boolean isBlocked(float x, float y) {
         int tileSize = map.getTileWidth();
-        float tolerance = 1f;
+        float tol = 1f;
 
-        int left = (int)((x + tolerance) / tileSize);
-        int right = (int)((x + width - 1 - tolerance) / tileSize);
-        int top = (int)((y + tolerance) / tileSize);
-        int bottom = (int)((y + height - 1 - tolerance) / tileSize);
+        int left = (int) ((x + tol) / tileSize);
+        int right = (int) ((x + width - 1 - tol) / tileSize);
+        int top = (int) ((y + tol) / tileSize);
+        int bottom = (int) ((y + height - 1 - tol) / tileSize);
 
-        int wallLayerIndex = map.getLayerIndex("wall");
-        if (wallLayerIndex == -1) return false;
+        int wallLayer = map.getLayerIndex("wall");
+        if (wallLayer == -1) return false;
 
         for (int i = left; i <= right; i++) {
-            if (map.getTileId(i, top, wallLayerIndex) != 0) return true;
-            if (map.getTileId(i, bottom, wallLayerIndex) != 0) return true;
+            if (map.getTileId(i, top, wallLayer) != 0) return true;
+            if (map.getTileId(i, bottom, wallLayer) != 0) return true;
         }
         for (int i = top; i <= bottom; i++) {
-            if (map.getTileId(left, i, wallLayerIndex) != 0) return true;
-            if (map.getTileId(right, i, wallLayerIndex) != 0) return true;
+            if (map.getTileId(left, i, wallLayer) != 0) return true;
+            if (map.getTileId(right, i, wallLayer) != 0) return true;
         }
-
         return false;
     }
 
     private String getCurrentFootstepLayer() {
-        int tileX = (int)((x + width / 2) / map.getTileWidth());
-        int tileY = (int)((y + height) / map.getTileHeight());
+        int tileX = (int) ((x + width / 2f) / map.getTileWidth());
+        int tileY = (int) ((y + height) / map.getTileHeight());
 
         int grassLayer = map.getLayerIndex("floor.grass");
         int pathLayer = map.getLayerIndex("floor.path");
 
         for (int i = 0; i < map.getLayerCount(); i++) {
             int tileId = map.getTileId(tileX, tileY, i);
-
             if (tileId != 0) {
-                if (i == grassLayer) {
-                    return "floor.grass";
-                } else if (i == pathLayer) {
-                    return "floor.path";
-                }
-
+                if (i == grassLayer) return "floor.grass";
+                if (i == pathLayer) return "floor.path";
             }
         }
-
-        return "";
+        return "floor.grass";
     }
 
     public void damage(int damage) {
@@ -362,7 +343,9 @@ public class Player {
         recentlyDamaged = true;
         damageTimestamp = System.currentTimeMillis();
 
-        long now = System.currentTimeMillis();
+        long now = damageTimestamp;
+        // in Millisekunden
+        long damageSoundCooldown = 200;
         if (now - lastDamageSoundTime >= damageSoundCooldown) {
             damageSound.stop();
             damageSound.play(1.0f, 0.5f);
@@ -373,17 +356,28 @@ public class Player {
     }
 
     public void checkDeath() {
-        if(health <= 0) {
-
+        if (health <= 0) {
+            // TODO: Handle player death (e.g., restart level, show game over, etc.)
         }
     }
 
+    // Getters & Setters
 
+    public float getX() {
+        return x;
+    }
 
-    public float getX() { return x; }
-    public float getY() { return y; }
-    public int getWidth() { return width; }
-    public int getHeight() { return height; }
+    public float getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
 
     public int maxHealth() {
         return maxHealth;
@@ -393,7 +387,16 @@ public class Player {
         return health;
     }
 
-    public void setPosition(float x, float y) { this.x = x; this.y = y; }
-    public void setX(float x) { this.x = x; }
-    public void setY(float y) { this.y = y; }
+    public void setPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
 }

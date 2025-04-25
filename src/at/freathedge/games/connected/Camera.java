@@ -13,8 +13,6 @@ public class Camera {
     private float x, y;
     private float targetX, targetY;
     private float lerpSpeed = 0.05f;
-    private float offsetX = 100;
-    private float offsetY = 50;
 
     private float zoomFactor = 1.0f;
     private float screenWidth, screenHeight;
@@ -32,60 +30,75 @@ public class Camera {
         this.map = map;
     }
 
+    /**
+     * Aktualisiert die Kameraposition so, dass der Spieler
+     * immer in der Mitte des Bildschirms bleibt.
+     *
+     * @param playerX      X-Position des Spielers in Weltkoordinaten
+     * @param playerY      Y-Position des Spielers in Weltkoordinaten
+     * @param screenWidth  Breite des Fensters in Pixeln
+     * @param screenHeight Höhe des Fensters in Pixeln
+     * @param delta         Zeit seit letztem Frame (Millisekunden)
+     */
     public void update(float playerX, float playerY, float screenWidth, float screenHeight, int delta) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
 
-        float zoomedHalfWidth = screenWidth / (2f * zoomFactor);
-        float zoomedHalfHeight = screenHeight / (2f * zoomFactor);
+        // Bildschirmhalbwerte angepasst an aktuellen Zoom
+        float halfW = screenWidth  / (2f * zoomFactor);
+        float halfH = screenHeight / (2f * zoomFactor);
 
-        targetX = playerX - zoomedHalfWidth + offsetX;
-        targetY = playerY - zoomedHalfHeight + offsetY;
+        // Zielposition so setzen, dass Spieler zentriert ist
+        targetX = playerX - halfW;
+        targetY = playerY - halfH;
 
-        float maxX = map.getWidth() * map.getTileWidth() - screenWidth / zoomFactor;
+        // Maximalen Kamerabereich berechnen (Mapgröße minus sichtbarer Bereich)
+        float maxX = map.getWidth()  * map.getTileWidth()  - screenWidth  / zoomFactor;
         float maxY = map.getHeight() * map.getTileHeight() - screenHeight / zoomFactor;
 
+        // Clamp, damit die Kamera nicht über die Map-Ränder hinausgeht
         targetX = Math.max(0, Math.min(targetX, maxX));
         targetY = Math.max(0, Math.min(targetY, maxY));
 
+        // Sanftes Nachziehen (Lerp)
         x += (targetX - x) * lerpSpeed * (delta / 16.0f);
         y += (targetY - y) * lerpSpeed * (delta / 16.0f);
     }
 
+    /** Wendet Scale und Translation an, bevor gezeichnet wird */
     public void apply(Graphics g) {
         g.scale(zoomFactor, zoomFactor);
         g.translate(-x, -y);
     }
 
+    /** Setzt den Zoomfaktor (1.0 = 100%) */
     public void zoom(float factor) {
         this.zoomFactor = factor;
     }
 
+    /** Zeichnet Text relativ zur Kamera */
     public void drawText(String text, float screenX, float screenY) {
-        java.awt.Font awtFont = new java.awt.Font("Poppins", Font.PLAIN, 20);
+        Font awtFont = new Font("Poppins", Font.PLAIN, 20);
         TrueTypeFont font = new TrueTypeFont(awtFont, false);
-
         font.drawString(x + screenX, y + screenY, text);
     }
 
+    /** Rendert die Lebensanzeige des Spielers oben links im Viewport */
     public void renderPlayerHealtbar(Graphics g, Player player) {
         float healthPercentage = (float) player.health() / player.maxHealth();
-        System.out.println("healt" + player.health());
-        System.out.println("Healthpercentage: " + healthPercentage);
 
+        // Hintergrund
         g.setColor(Color.darkGray);
-        g.fillRect(this.x + 10, y + 10, 200, 20);
-
+        g.fillRect(x + 10, y + 10, 200, 20);
+        // Gesundheitsanzeige
         g.setColor(Color.red);
-        g.fillRect(this.x + 10, y + 10, 200 * healthPercentage, 20);
-
+        g.fillRect(x + 10, y + 10, 200 * healthPercentage, 20);
+        // Umrandung
         g.setColor(Color.black);
-        g.drawRect(this.x + 10, this.y + 10, 200, 20);
+        g.drawRect(x + 10, y + 10, 200, 20);
     }
 
-
-
-
+    // Getter für Position und Zoom
     public float getZoom() {
         return zoomFactor;
     }

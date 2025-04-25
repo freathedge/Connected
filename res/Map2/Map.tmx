@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="1">
+ <tileset firstgid="1" source="Grass_Middle.tsx"/>
+ <tileset firstgid="2" source="Path.tsx"/>
+ <tileset firstgid="20" source="Beach.tsx"/>
+ <tileset firstgid="35" source="Cliff.tsx"/>
+ <tileset firstgid="53" source="Path_Middle.tsx"/>
+ <tileset firstgid="54" source="Water.tsx"/>
+ <tileset firstgid="72" source="Water_Middle.tsx"/>
+ <tileset firstgid="73" source="Outdoor_Decor_Free.tsx"/>
+ <tileset firstgid="157" source="Oak_Tree_Small.tsx"/>
+ <tileset firstgid="175" source="House.tsx"/>
+ <layer id="1" name="floor.grass" width="100" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu3RQQrDMBAEQfn/n84xCHywQNodJ7VQVxlPX2OMCwAAAABgk7ur/Fbl99+gco+n172JHjXff4PKPZ5e9yZpPX7lurfVY77ubfWYr3tbPebr3nZXj+7eu77Vva0e5/5DDz12/cfKnfyX7m31OPe2Hnrs+o+V00OPZCc2Wjk99Eh2YqOV00OPZCc2Wjk9zveofF+PrPf1yHpfj6z3/6FH6unx7uveVo/vde+qx/1176vHfN37prFRFj2y6JFFjyx6ZNEjix5Z9MiiRxY9suiRRY8semTRI4seWfTIokcWPbLokUUPAAAAAAAAAAAAAAAAAACqfAB+JHMiQJwAAA==
+  </data>
+ </layer>
+ <layer id="2" name="floor.path" width="100" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu3aa07CQBSA0cH3KxpkLe5/a9IEkmECAmXG3mnPSW78YWihn4O0NCUAAAAAgHrutnOfzcOEz2WVzVI9bucpm+cJn8vqyCzN0GOd4vVYqqjrY6nKHp/p8P9JrzP8H+yxa9ljLjOs8557fKfpj6Ee1kc05fp4385rxflIh8ep9vZP7af3HvnraL39Y+cZt553nNpPb/SIpUWP/BrMV7H9/PN0zWszc+qRf7aq0ePSzwg11+KcetS+XqLHeC3er/QYL38dw/uWHtOyPmLRI5a59+itiR6xtOjxki67fvVWYV97c3u/2qT6f7P59lusiXP76blHq+Olx3X0iEWPWFrfz/DX9d2W+5lLj3LWZ35/am79Pv5nN5vdz2sf33OPMcduM+IxY3rsZ0k9Wh7XsX2X2iM/d/uP+wxa3c9QznCu2WOP1iLdj4oe0egRix6x6BGLHrHoEYsesegRS+vvH7mO9RGLHrHoEYsesegRix6x6BGLHrHoEUv5/XzNe6gBAAAAAAAAAAAAAAAAACD3C1gHmq5AnAAA
+  </data>
+ </layer>
+ <layer id="5" name="Nature" width="100" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu3cO04DMRAA0FwPaIDz0EAFFVRwCDgkbLFCgRA2Wa/HHr8npUwy0n5sz4y92wFA256jA9jYdXQAR1xGB1DQbXQAwGI30QEMLPuYy7er6ADYcxEdwIZeowMA4JeW8xBLvEUHUNlddAAQ4CE6AOhIrby3fB2jeYwOgINK1C3vC/wG9Kj3XEBJWWphT9EB0I2Xiv+1ZJzN8gy2pOY17pH5Xzum+YjxC9bz3gfYZ43BMepb25n6Qv/K2Wfag7Sl0v1PmfuQyc9+PyjPcwWH9fJsqG2Uox+5jlb2qdp3QWlqm5CDnnCAnFrun1GjBM5VIrcxwjuolzzvKFoekzOouR9QbaItcpPQr1LzsdHOV/tp6dmlI/RNOscVmKl5MSu1XnBPAfSjlR7NU2XJ579/fT7O/O5U+5nXrhnWsDXzyCPUvEqplU/+L0chrw2cYuk7o9d5UEtKrv8zvuvVyfviekEbPIsAQA9aOnciS70EOE4fDtHW3oPO9gaA9T4Bxb4/0ECcAAA=
+  </data>
+ </layer>
+ <layer id="3" name="wall" width="100" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu2bt64WMRCF910IIvRk6ICGEkQD9HR0PANvABU00EABiJxzjm/EWe79dVer3X8dxvYZez7pSFcrb/LxeMb+927rum67iUI7oJ2dwcKuzvxgItSPs9IPYvzH4oMLZj9yx+CFzPebgtkPCRj6eMjSGKvdD22YH1yYH1yYH1zU4EdNayFJP9hqGY3UEB+pKDG+UvhxHbrheU7Od2eOYyk/Lg7+vgndmjg+1z7kHjHthvkm5DlSIuXHJaHjIfeIuXbIc6REyo/LAseX5rm5a4W2822bA6Z8PpznWsXVj6Vx5Jsnpo7fhu4E3CO0HSM15Y/VfMeWE3xgyh+h91ixmu/WtRvHDlsspcofrjW+5F7H0nzXM44dtlhiyue+3IXuQfc9zhnHTsn6amrMavXjAfQQegQ9hp6UfRwxcvkRsoeyjqfQM+g59AJ6uXlcav6Tfl5XQutd3zhft7Y45XmtnlfQa+gN9BZ6N9MutF9LrYVSxMc+aP9AB7rpXBuznngPfYA+Qp+gzzPnhvarS22QghR+HIROQoc2dRg6B50ftYvZj/oCfYW+Qd+hHzPnjvu1xXq396P34Xi35ccZ6PSoXcx+1E/oF/Qb+gP9dbxWi/Vu78eJbsuT3o8+Ns5EXFMqTzPVu1OkyOdHoKMDHVvT9prDvXMR4rn0b/el1x9XoSsLbUrVni5I/9ZY2g8XWtqHZ/BjafxL1p5z9RXLN0MMfuQc/3P1lTY/UtYl0muvdWuKWuorTbCtKXxI4YfLmFtqE3MNtjHvQ43xoZmVHyz5zAfJb+1Y0Bwfkt9KsMCaP1zGuOWPfGge4zGw+qF5jMfA6kermB9ctOIH8//gDJnzg/k3h5qZ80Niz1XLmHQh17vM+VHqexcf2P0O2fPImT/Y+4+BVvK5FrR+v1srufwo8U2Cxvkxlx8a6gMGLH9wYX5wEeOHxvmZHYsPLsyPDVi+H3DxI/ZZNaw9NPmxxFIeael76FhyzFe29nDH8gcXpf2osWaOeafSfkyhIf+ngtGPlvN/Dj98x7tv/q9pzovxw7WfS413ljWFDzF+uPaz1bvuxPhh/SwPYz5vmVJ+hNS0LdTBKfxwyaMhOb5UXZCzfisVH5Z7prH8wYW0Hy3M8SmR9qPlvQ4JpP2Yygs17WekJnf+WPKmde8sn2/AstdVux8s/exK7X5ow/zgwvzgotT+Vcy1a67BLD64aNGPPr5Y664W/WDG/ODC/OAi1g/WeVgrbPFRWy3r+z5sfrSO+RGP5Jyt1Y/a5rUVWv2oFfODi96P3dAeE4X2Qv8Ati+lRECcAAA=
+  </data>
+ </layer>
+ <layer id="4" name="Decor" width="100" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu3WMQrAMAgF0Fy3W7dev0MOoIWQ/sB7myBu+h0DAAAAAAAA/nUVNXvdRc1eT1EDAPn8u1n8u1n8u8Ap5HkWeZ5FngOnkOdZ5HmWL3ne2Z2qZ8UMps7uVD0rZjB1fuGqZ8UMSOT2Z3H7s7j9AAAAAAAAAAAAAAAAAAAAAAAAAAAAANletpULNECcAAA=
+  </data>
+ </layer>
+</map>
