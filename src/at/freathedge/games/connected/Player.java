@@ -1,5 +1,6 @@
 package at.freathedge.games.connected;
 
+import at.freathedge.games.connected.collider.Collider;
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.tiled.TiledMap;
@@ -54,6 +55,11 @@ public class Player {
 
     private long lastDamageSoundTime = 0;
 
+    private Map<Integer, Image> wallTileImages = new HashMap<>();
+
+    private final Collider collider;
+
+
     public enum Direction {
         FRONT, BACK, LEFT, RIGHT
     }
@@ -65,11 +71,21 @@ public class Player {
         this.currentDirection = Direction.FRONT;
         loadAnimations();
         loadSounds();
+        loadWallTileImages();
         setDirection(currentDirection);
         this.punchDirection = currentDirection;
+        this.collider = new Collider(map);
+
     }
 
     public void render(Graphics g, float mouseWorldX, float mouseWorldY) {
+
+        g.setColor(Color.blue);
+        g.drawRect(x, y, width, height);
+
+        // Collider-Map zeichnen
+        collider.renderDebug(g);
+
         // Zeichne Spieler
         if (recentlyDamaged && System.currentTimeMillis() - damageTimestamp <= damageEffectDuration) {
             currentAnimation.getCurrentFrame().draw(x, y, width, height, new Color(255, 0, 0));
@@ -172,8 +188,12 @@ public class Player {
         float step = currentSpeed * delta;
         float nx = x + dx * step;
         float ny = y + dy * step;
-        if (!isBlocked(nx, y)) x = nx;
-        if (!isBlocked(x, ny)) y = ny;
+        if (!collider.isBlockedRectangle(nx, y, width, height)) {
+            x = nx;
+        }
+        if (!collider.isBlockedRectangle(x, ny, width, height)) {
+            y = ny;
+        }
     }
 
     public void punch(boolean leftClick, float mouseWorldX, float mouseWorldY) {
@@ -298,28 +318,8 @@ public class Player {
         }
     }
 
-    private boolean isBlocked(float x, float y) {
-        int tileSize = map.getTileWidth();
-        float tol = 1f;
 
-        int left = (int) ((x + tol) / tileSize);
-        int right = (int) ((x + width - 1 - tol) / tileSize);
-        int top = (int) ((y + tol) / tileSize);
-        int bottom = (int) ((y + height - 1 - tol) / tileSize);
 
-        int wallLayer = map.getLayerIndex("wall");
-        if (wallLayer == -1) return false;
-
-        for (int i = left; i <= right; i++) {
-            if (map.getTileId(i, top, wallLayer) != 0) return true;
-            if (map.getTileId(i, bottom, wallLayer) != 0) return true;
-        }
-        for (int i = top; i <= bottom; i++) {
-            if (map.getTileId(left, i, wallLayer) != 0) return true;
-            if (map.getTileId(right, i, wallLayer) != 0) return true;
-        }
-        return false;
-    }
 
     private String getCurrentFootstepLayer() {
         int tileX = (int) ((x + width / 2f) / map.getTileWidth());
@@ -399,4 +399,22 @@ public class Player {
     public void setY(float y) {
         this.y = y;
     }
+
+    private void loadWallTileImages() throws SlickException {
+        int wallLayer = map.getLayerIndex("wall");
+        if (wallLayer == -1) return;
+
+        for (int x = 0; x < map.getWidth(); x++) {
+            for (int y = 0; y < map.getHeight(); y++) {
+                int tileId = map.getTileId(x, y, wallLayer);
+                if (tileId != 0 && !wallTileImages.containsKey(tileId)) {
+                    Image tileImage = map.getTileImage(x, y, wallLayer);
+                    if (tileImage != null) {
+                        wallTileImages.put(tileId, tileImage);
+                    }
+                }
+            }
+        }
+    }
+
 }
