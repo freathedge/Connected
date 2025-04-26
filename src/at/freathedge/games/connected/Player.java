@@ -1,5 +1,8 @@
 package at.freathedge.games.connected;
 
+import at.freathedge.games.connected.collider.Collider;
+import at.freathedge.games.connected.util.AnimationLoader;
+import at.freathedge.games.connected.util.SoundBank;
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.tiled.TiledMap;
@@ -43,16 +46,25 @@ public class Player {
 
     private boolean recentlyDamaged = false;
     private long damageTimestamp = 0;
-    private final int damageEffectDuration = 150; // in Millisekunden
+    private final int damageEffectDuration = 150;
 
-    private Map<String, Sound[]> stepSoundsByLayer = new HashMap<>();
     private long lastStepSoundTime = 0;
-    private int stepSoundIndex = 0;
 
-    private Sound swingSound;
-    private Sound damageSound;
 
     private long lastDamageSoundTime = 0;
+
+    private Map<Integer, Image> wallTileImages = new HashMap<>();
+
+    private final Collider collider;
+
+    private final int hitboxMarginX = 2;
+    private final int hitboxHeight = 6;
+
+    SoundBank grassSteps = new SoundBank();
+    SoundBank stoneSteps = new SoundBank();
+    SoundBank swingSounds = new SoundBank();
+    SoundBank damageSounds = new SoundBank();
+
 
     public enum Direction {
         FRONT, BACK, LEFT, RIGHT
@@ -65,11 +77,21 @@ public class Player {
         this.currentDirection = Direction.FRONT;
         loadAnimations();
         loadSounds();
+        loadWallTileImages();
         setDirection(currentDirection);
         this.punchDirection = currentDirection;
+        this.collider = new Collider(map);
+
     }
 
     public void render(Graphics g, float mouseWorldX, float mouseWorldY) {
+
+        g.setColor(Color.blue);
+        Rectangle hitbox = getHitbox();
+        g.drawRect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
+
+        collider.renderDebug(g);
+
         // Zeichne Spieler
         if (recentlyDamaged && System.currentTimeMillis() - damageTimestamp <= damageEffectDuration) {
             currentAnimation.getCurrentFrame().draw(x, y, width, height, new Color(255, 0, 0));
@@ -122,10 +144,13 @@ public class Player {
         long now = System.currentTimeMillis();
         if (moving && now - lastStepSoundTime >= 500) {
             String layerName = getCurrentFootstepLayer();
-            Sound[] sounds = stepSoundsByLayer.getOrDefault(layerName, stepSoundsByLayer.get("floor.grass"));
-            if (sounds != null && sounds.length > 0) {
-                sounds[stepSoundIndex].play(1.0f, 0.3f);
-                stepSoundIndex = (stepSoundIndex + 1) % sounds.length;
+            switch (layerName) {
+                case "floor.grass":
+                    grassSteps.playRandom(1.0f, 0.3f);
+                    break;
+                case "floor.path":
+                    stoneSteps.playRandom(1.0f, 0.3f);
+                    break;
             }
             lastStepSoundTime = now;
         }
@@ -172,9 +197,30 @@ public class Player {
         float step = currentSpeed * delta;
         float nx = x + dx * step;
         float ny = y + dy * step;
-        if (!isBlocked(nx, y)) x = nx;
-        if (!isBlocked(x, ny)) y = ny;
+
+        Rectangle hitbox = getHitbox();
+
+        Rectangle futureHitboxX = new Rectangle(
+                hitbox.getX() + (nx - x),
+                hitbox.getY(),
+                hitbox.getWidth(),
+                hitbox.getHeight()
+        );
+        if (!collider.isBlockedRectangle(futureHitboxX.getX(), futureHitboxX.getY(), futureHitboxX.getWidth(), futureHitboxX.getHeight())) {
+            x = nx;
+        }
+
+        Rectangle futureHitboxY = new Rectangle(
+                hitbox.getX(),
+                hitbox.getY() + (ny - y),
+                hitbox.getWidth(),
+                hitbox.getHeight()
+        );
+        if (!collider.isBlockedRectangle(futureHitboxY.getX(), futureHitboxY.getY(), futureHitboxY.getWidth(), futureHitboxY.getHeight())) {
+            y = ny;
+        }
     }
+
 
     public void punch(boolean leftClick, float mouseWorldX, float mouseWorldY) {
         if (leftClick && !isPunching) {
@@ -194,8 +240,8 @@ public class Player {
             setDirection(punchDir);
 
             isPunching = true;
-            swingSound.stop();
-            swingSound.play(1.0f, 1.5f);
+            swingSounds.stopAll();
+            swingSounds.playRandom(1.0f, 1.5f);
 
             switch (punchDir) {
                 case FRONT:
@@ -215,59 +261,36 @@ public class Player {
     }
 
     private void loadAnimations() throws SlickException {
-        Image[] idleFrames = new Image[6];
-        Image[] walkFrontFrames = new Image[6];
-        Image[] walkLeftFrames = new Image[6];
-        Image[] walkRightFrames = new Image[6];
-        Image[] walkBackFrames = new Image[6];
-        Image[] punchFrontFrames = new Image[4];
-        Image[] punchLeftFrames = new Image[4];
-        Image[] punchRightFrames = new Image[4];
-        Image[] punchBackFrames = new Image[4];
-
-        for (int i = 0; i < 6; i++) {
-            idleFrames[i] = new Image("res/player/idle/player_idle" + (i + 1) + ".png");
-            walkFrontFrames[i] = new Image("res/player/walk_front/player_walking_front" + (i + 1) + ".png");
-            walkLeftFrames[i] = new Image("res/player/walk_left/player_walking_left" + (i + 1) + ".png");
-            walkRightFrames[i] = new Image("res/player/walk_right/player_walking_right" + (i + 1) + ".png");
-            walkBackFrames[i] = new Image("res/player/walk_back/player_walking_back" + (i + 1) + ".png");
-        }
-        for (int i = 0; i < 4; i++) {
-            punchFrontFrames[i] = new Image("res/player/swing_front/swing_front" + (i + 1) + ".png");
-            punchLeftFrames[i] = new Image("res/player/swing_left/swing_left" + (i + 1) + ".png");
-            punchRightFrames[i] = new Image("res/player/swing_right/swing_right" + (i + 1) + ".png");
-            punchBackFrames[i] = new Image("res/player/swing_back/swing_back" + (i + 1) + ".png");
-        }
 
         int frameDuration = 100;
-        idleAnimation = new Animation(idleFrames, frameDuration);
-        walkFrontAnimation = new Animation(walkFrontFrames, frameDuration);
-        walkLeftAnimation = new Animation(walkLeftFrames, frameDuration);
-        walkRightAnimation = new Animation(walkRightFrames, frameDuration);
-        walkBackAnimation = new Animation(walkBackFrames, frameDuration);
+        idleAnimation = AnimationLoader.loadAnimation("res/player/idle/player_idle", 6, frameDuration);
+        walkFrontAnimation = AnimationLoader.loadAnimation("res/player/walk_front/player_walking_front", 6, frameDuration);
+        walkLeftAnimation = AnimationLoader.loadAnimation("res/player/walk_left/player_walking_left", 6, frameDuration);
+        walkRightAnimation = AnimationLoader.loadAnimation("res/player/walk_right/player_walking_right", 6, frameDuration);
+        walkBackAnimation = AnimationLoader.loadAnimation("res/player/walk_back/player_walking_back", 6, frameDuration);
 
-        punchFrontAnimation = new Animation(punchFrontFrames, frameDuration);
-        punchLeftAnimation = new Animation(punchLeftFrames, frameDuration);
-        punchRightAnimation = new Animation(punchRightFrames, frameDuration);
-        punchBackAnimation = new Animation(punchBackFrames, frameDuration);
+        punchFrontAnimation = AnimationLoader.loadAnimation("res/player/swing_front/swing_front", 4, frameDuration);
+        punchLeftAnimation = AnimationLoader.loadAnimation("res/player/swing_left/swing_left", 4, frameDuration);
+        punchRightAnimation = AnimationLoader.loadAnimation("res/player/swing_right/swing_right", 4, frameDuration);
+        punchBackAnimation = AnimationLoader.loadAnimation("res/player/swing_back/swing_back", 4, frameDuration);
 
         currentAnimation = idleAnimation;
     }
 
     private void loadSounds() throws SlickException {
-        stepSoundsByLayer.put("floor.grass", loadStepSoundsFromPath("res/sounds/player/grass_step/grass_step"));
-        stepSoundsByLayer.put("floor.path", loadStepSoundsFromPath("res/sounds/player/stone_step/stone_step"));
+        loadStepSounds(grassSteps, "res/sounds/player/grass_step/grass_step");
+        loadStepSounds(stoneSteps, "res/sounds/player/stone_step/stone_step");
 
-        swingSound = new Sound("res/sounds/player/sword_swing.ogg");
-        damageSound = new Sound("res/sounds/player/player_damage.ogg");
+        swingSounds.addSound("res/sounds/player/sword_swing.ogg");
+        damageSounds.addSound("res/sounds/player/player_damage.ogg");
+
+
     }
 
-    private Sound[] loadStepSoundsFromPath(String basePath) throws SlickException {
-        Sound[] sounds = new Sound[6];
+    private void loadStepSounds(SoundBank soundBank, String path) throws SlickException {
         for (int i = 0; i < 6; i++) {
-            sounds[i] = new Sound(basePath + (i + 1) + ".ogg");
+            soundBank.addSound(path + (i + 1) + ".ogg");
         }
-        return sounds;
     }
 
     public void setDirection(Direction direction) {
@@ -298,28 +321,6 @@ public class Player {
         }
     }
 
-    private boolean isBlocked(float x, float y) {
-        int tileSize = map.getTileWidth();
-        float tol = 1f;
-
-        int left = (int) ((x + tol) / tileSize);
-        int right = (int) ((x + width - 1 - tol) / tileSize);
-        int top = (int) ((y + tol) / tileSize);
-        int bottom = (int) ((y + height - 1 - tol) / tileSize);
-
-        int wallLayer = map.getLayerIndex("wall");
-        if (wallLayer == -1) return false;
-
-        for (int i = left; i <= right; i++) {
-            if (map.getTileId(i, top, wallLayer) != 0) return true;
-            if (map.getTileId(i, bottom, wallLayer) != 0) return true;
-        }
-        for (int i = top; i <= bottom; i++) {
-            if (map.getTileId(left, i, wallLayer) != 0) return true;
-            if (map.getTileId(right, i, wallLayer) != 0) return true;
-        }
-        return false;
-    }
 
     private String getCurrentFootstepLayer() {
         int tileX = (int) ((x + width / 2f) / map.getTileWidth());
@@ -328,15 +329,35 @@ public class Player {
         int grassLayer = map.getLayerIndex("floor.grass");
         int pathLayer = map.getLayerIndex("floor.path");
 
+        boolean onGrass = false;
+        boolean onPath = false;
+
         for (int i = 0; i < map.getLayerCount(); i++) {
             int tileId = map.getTileId(tileX, tileY, i);
+
             if (tileId != 0) {
-                if (i == grassLayer) return "floor.grass";
-                if (i == pathLayer) return "floor.path";
+                if (i == grassLayer) {
+                    onGrass = true;
+                }
+                if (i == pathLayer) {
+                    onPath = true;
+                }
             }
         }
+
+        if (onPath) {
+            System.out.println("floor.path");
+            return "floor.path";
+        }
+        if (onGrass) {
+            System.out.println("floor.grass");
+            return "floor.grass";
+        }
+
+        // Standardfallback
         return "floor.grass";
     }
+
 
     public void damage(int damage) {
         this.health -= damage;
@@ -347,8 +368,8 @@ public class Player {
         // in Millisekunden
         long damageSoundCooldown = 200;
         if (now - lastDamageSoundTime >= damageSoundCooldown) {
-            damageSound.stop();
-            damageSound.play(1.0f, 0.5f);
+            damageSounds.stopAll();
+            damageSounds.playRandom(1.0f, 0.5f);
             lastDamageSoundTime = now;
         }
 
@@ -399,4 +420,32 @@ public class Player {
     public void setY(float y) {
         this.y = y;
     }
+
+    private void loadWallTileImages() throws SlickException {
+        int wallLayer = map.getLayerIndex("wall");
+        if (wallLayer == -1) return;
+
+        for (int x = 0; x < map.getWidth(); x++) {
+            for (int y = 0; y < map.getHeight(); y++) {
+                int tileId = map.getTileId(x, y, wallLayer);
+                if (tileId != 0 && !wallTileImages.containsKey(tileId)) {
+                    Image tileImage = map.getTileImage(x, y, wallLayer);
+                    if (tileImage != null) {
+                        wallTileImages.put(tileId, tileImage);
+                    }
+                }
+            }
+        }
+    }
+
+    public Rectangle getHitbox() {
+        return new Rectangle(
+                x + hitboxMarginX,
+                y + height - hitboxHeight,
+                width - hitboxMarginX * 2,
+                hitboxHeight
+        );
+    }
+
+
 }
