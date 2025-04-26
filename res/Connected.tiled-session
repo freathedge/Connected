@@ -1,0 +1,58 @@
+{
+    "activeFile": "",
+    "expandedProjectPaths": [
+        ".",
+        "Map2"
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "Map2/Beach.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Map2/Cliff.tsx": {
+            "scaleInDock": 1
+        },
+        "Map2/Grass_Middle.tsx": {
+            "scaleInDock": 1
+        },
+        "Map2/House.tsx": {
+            "scaleInDock": 1
+        },
+        "Map2/Map.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 548,
+                "y": 745.3333333333333
+            }
+        },
+        "Map2/Oak_Tree_Small.tsx": {
+            "scaleInDock": 1
+        },
+        "Map2/Outdoor_Decor_Free.tsx": {
+            "scaleInDock": 1
+        },
+        "Map2/Path.tsx": {
+            "scaleInDock": 1
+        },
+        "Map2/Path_Middle.tsx": {
+            "scaleInDock": 1
+        },
+        "Map2/Water.tsx": {
+            "scaleInDock": 1
+        },
+        "Map2/Water_Middle.tsx": {
+            "scaleInDock": 1
+        }
+    },
+    "openFiles": [
+    ],
+    "project": "Connected.tiled-project",
+    "recentFiles": [
+        "Map2/Map.tmx",
+        "Map2/Beach.tsx"
+    ]
+}

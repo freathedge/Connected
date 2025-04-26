@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="1">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="1">
  <tileset firstgid="1" source="Grass_Middle.tsx"/>
  <tileset firstgid="2" source="Path.tsx"/>
  <tileset firstgid="20" source="Beach.tsx"/>
@@ -18,6 +18,11 @@
  <layer id="2" name="floor.path" width="100" height="100">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAACu3aa07CQBSA0cH3KxpkLe5/a9IEkmECAmXG3mnPSW78YWihn4O0NCUAAAAAgHrutnOfzcOEz2WVzVI9bucpm+cJn8vqyCzN0GOd4vVYqqjrY6nKHp/p8P9JrzP8H+yxa9ljLjOs8557fKfpj6Ee1kc05fp4385rxflIh8ep9vZP7af3HvnraL39Y+cZt553nNpPb/SIpUWP/BrMV7H9/PN0zWszc+qRf7aq0ePSzwg11+KcetS+XqLHeC3er/QYL38dw/uWHtOyPmLRI5a59+itiR6xtOjxki67fvVWYV97c3u/2qT6f7P59lusiXP76blHq+Olx3X0iEWPWFrfz/DX9d2W+5lLj3LWZ35/am79Pv5nN5vdz2sf33OPMcduM+IxY3rsZ0k9Wh7XsX2X2iM/d/uP+wxa3c9QznCu2WOP1iLdj4oe0egRix6x6BGLHrHoEYsesegRS+vvH7mO9RGLHrHoEYsesegRix6x6BGLHrHoEUv5/XzNe6gBAAAAAAAAAAAAAAAAACD3C1gHmq5AnAAA
+  </data>
+ </layer>
+ <layer id="6" name="player" width="100" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu3BMQEAAADCoPVP7WULoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgBt5RKnmQJwAAA==
   </data>
  </layer>
  <layer id="5" name="Nature" width="100" height="100">

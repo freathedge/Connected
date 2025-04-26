@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="500" height="500" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="1">
+ <tileset firstgid="1" source="grass tiles spritesheet.tsx"/>
+ <layer id="1" name="floor.grass" width="30" height="30">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu3NsQkAAAjAMP3/Cj919QIRTCFzKyMKWDPz9fX19fX99gVuaa/uc5AQDgAA
+  </data>
+ </layer>
+ <layer id="2" name="floor.path" width="30" height="30">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu3NsQkAAAjAMP3/Ec909AMRTKBzI4BNlZOvr6+vr++3L3BLA4nF8uYQDgAA
+  </data>
+ </layer>
+</map>

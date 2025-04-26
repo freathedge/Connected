@@ -38,7 +38,9 @@ public class Collider {
 
                 for (int px = 0; px < tileImage.getWidth(); px++) {
                     for (int py = 0; py < tileImage.getHeight(); py++) {
-                        if (tileImage.getColor(px, py).getAlpha() > 0.1f) {
+                        Color color = tileImage.getColor(px, py);
+
+                        if (isSolidPixel(color)) {
                             found = true;
                             if (px < minX) minX = px;
                             if (py < minY) minY = py;
@@ -54,6 +56,14 @@ public class Collider {
             }
         }
     }
+
+    private boolean isSolidPixel(Color color) {
+        float alpha = color.a;
+        float brightness = (color.r + color.g + color.b) / 3.0f;
+
+        return alpha > 0.1f && brightness > 0.2f;
+    }
+
 
     public boolean isBlocked(float worldX, float worldY) {
         int tileSize = map.getTileWidth();
