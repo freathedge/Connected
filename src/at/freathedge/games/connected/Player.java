@@ -182,16 +182,8 @@ public class Player {
         }
 
         float currentSpeed = speed;
-        int tileSize = map.getTileWidth();
-        int grassLayer = map.getLayerIndex("floor.grass");
-        if (grassLayer != -1) {
-            int bx = (int) (x / tileSize);
-            int by = (int) ((y + height - 1) / tileSize);
-            int leftTile = map.getTileId(bx, by, grassLayer);
-            int rightTile = map.getTileId((int) ((x + width - 1) / tileSize), by, grassLayer);
-            if (leftTile != 0 || rightTile != 0) {
-                currentSpeed *= 0.6f;
-            }
+        if(getCurrentFootstepLayer() == "floor.grass") {
+            currentSpeed *= 0.6;
         }
 
         float step = currentSpeed * delta;

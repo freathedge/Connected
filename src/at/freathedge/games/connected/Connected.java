@@ -2,18 +2,21 @@ package at.freathedge.games.connected;
 
 import at.freathedge.games.connected.spawner.EnemySpawner;
 import at.freathedge.games.connected.ui.UIButton;
+import at.freathedge.games.connected.util.MapHandler;
+import at.freathedge.games.connected.util.MapRenderer;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
 import javax.swing.*;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.Font;
 
 public class Connected extends BasicGame {
     private Player player;
     private Camera camera;
-    private TiledMap map;
-    private int playerSpawnerX, playerSpawnerY;
+    private GameMap map;
     private final List<EnemySpawner> spawners = new ArrayList<>();
     private List<Enemy> enemies = new ArrayList<>();
 
@@ -22,32 +25,63 @@ public class Connected extends BasicGame {
 
     private boolean paused = false;
 
+    private boolean loading = true;
+    private int loadingTimer = 0;
+    private final int loadingDuration = 5000; // 1000ms = 1 Sekunde Ladebildschirm
+    private int loadingDotTimer = 0;
+    private int loadingDotCount = 0;
+
+    private MapHandler mapHandler;
+    private MapRenderer mapRenderer;
+
+
+
     public Connected(String title) throws SlickException {
         super(title);
     }
 
     @Override
     public void init(GameContainer gc) throws SlickException {
-        map = new TiledMap("Tiled/spawnmap.tmx", "Tiled");
-        loadPlayerSpawner();
-        player = new Player(playerSpawnerX, playerSpawnerY, map);
-        //player = new Player(1000, 1000, map);
+        mapHandler = new MapHandler("Tiled/spawnmap.tmx");
+        map = mapHandler.getMap();
+
+        player = new Player(mapHandler.getPlayerSpawnerX(), mapHandler.getPlayerSpawnerY(), map.getMap());
         camera = new Camera();
         camera.setMap(map);
         camera.zoom(3.5f); //default: 3.5f
+
+        mapRenderer = new MapRenderer(map, camera, player);
 
         java.awt.Font awtFont = new java.awt.Font("Verdana", java.awt.Font.BOLD, 24);
         TrueTypeFont font = new TrueTypeFont(awtFont, false);
         quitButton = new UIButton((float) (gc.getWidth() - 200) / 2, (float) (gc.getHeight() - 150) / 2, 200, 50, "Spiel beenden", font);
         resumeButton = new UIButton((float) (gc.getWidth() - 200) / 2, (float) (gc.getHeight() - 250) / 2, 200, 50, "Fortsetzen", font);
 
-        loadEnemySpawner();
+        spawners.addAll(mapHandler.getSpawners());
     }
 
 
 
     @Override
     public void update(GameContainer gc, int delta) throws SlickException {
+        if (loading) {
+            camera.update(player.getX(), player.getY(), gc.getWidth(), gc.getHeight(), delta);
+
+            loadingTimer += delta;
+            loadingDotTimer += delta;
+
+            if (loadingDotTimer >= 300) {
+                loadingDotCount = (loadingDotCount + 1) % 4;
+                loadingDotTimer = 0;
+            }
+
+            if (loadingTimer >= loadingDuration) {
+                loading = false;
+            }
+            return;
+        }
+
+
         Input input = gc.getInput();
 
         if (input.isKeyPressed(Input.KEY_ESCAPE)) {
@@ -88,7 +122,7 @@ public class Connected extends BasicGame {
         camera.update(player.getX(), player.getY(), gc.getWidth(), gc.getHeight(), delta);
 
         for (EnemySpawner spawner : spawners) {
-            Enemy newEnemy = spawner.update(delta, player, map);
+            Enemy newEnemy = spawner.update(delta, player, map.getMap());
             if (newEnemy != null) {
                 enemies.add(newEnemy);
             }
@@ -97,106 +131,64 @@ public class Connected extends BasicGame {
         for (Enemy enemy : enemies) {
             enemy.update(delta);
         }
-
     }
+
 
     @Override
     public void render(GameContainer gc, Graphics g) throws SlickException {
-        camera.apply(g);
+        if (loading) {
+            g.setColor(Color.black);
+            g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
 
-        float mouseScreenX = gc.getInput().getMouseX();
-        float mouseScreenY = gc.getInput().getMouseY();
-        float mouseWorldX = camera.getX() + mouseScreenX / camera.getZoom();
-        float mouseWorldY = camera.getY() + mouseScreenY / camera.getZoom();
+            g.setColor(Color.white);
 
-        // Sichtbarer Bereich der Kamera in Weltkoordinaten
-        float camX = camera.getX();
-        float camY = camera.getY();
-        float camW = gc.getWidth() / camera.getZoom();
-        float camH = gc.getHeight() / camera.getZoom();
-
-        int tileWidth = map.getTileWidth();
-        int tileHeight = map.getTileHeight();
-
-        // Kachelkoordinaten für den sichtbaren Bereich
-        int startX = (int) (camX / tileWidth);
-        int startY = (int) (camY / tileHeight);
-        int endX = (int) Math.ceil((camX + camW) / tileWidth);
-        int endY = (int) Math.ceil((camY + camH) / tileHeight);
-
-        // Begrenzung auf die Mapgröße
-        startX = Math.max(0, startX);
-        startY = Math.max(0, startY);
-        endX = Math.min(map.getWidth(), endX);
-        endY = Math.min(map.getHeight(), endY);
-
-        for (int i = 0; i < map.getLayerCount(); i++) {
-            if (map.getLayerIndex("player") == i) {
-                player.render(g, mouseWorldX, mouseWorldY);
-                continue;
+            StringBuilder loadingText = new StringBuilder("Loading");
+            for (int i = 0; i < loadingDotCount; i++) {
+                loadingText.append(".");
             }
 
-            for (int x = startX; x < endX; x++) {
-                for (int y = startY; y < endY; y++) {
-                    int tileID = map.getTileId(x, y, i);
-                    if (tileID != 0) {
-                        Image tileImage = map.getTileImage(x, y, i);
-                        if (tileImage != null) {
-                            tileImage.draw(x * tileWidth, y * tileHeight);
-                        }
-                    }
-                }
+            java.awt.Font awtFont = null;
+            try {
+                awtFont = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, new java.io.FileInputStream("res/fonts/PressStart2P-Regular.ttf")).deriveFont(24f);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
+            TrueTypeFont font = new TrueTypeFont(awtFont, false);
+            g.setFont(font);
+
+            g.drawString(loadingText.toString(), gc.getWidth() / 2f - 150, gc.getHeight() / 2f - 24);
+            return;
         }
 
+        // Kamera Transformation anwenden
+        camera.apply(g);
+
+        // Map rendern
+        mapRenderer.renderMap(g, gc);
+
+
+
+        // Enemies rendern
         for (Enemy enemy : enemies) {
             enemy.render(g);
         }
 
+        // Spieler-Lebensanzeige rendern
         camera.renderPlayerHealtbar(g, player);
 
+        // Falls Pause-Menü aktiv
         if (paused) {
             g.setColor(new Color(0, 0, 0, 0.5f));
             g.fillRect(camera.getX(), camera.getY(), gc.getWidth(), gc.getHeight());
 
+            // UI Buttons rendern ohne Kamera-Transformation
             g.resetTransform();
 
             quitButton.render(g, gc.getInput());
             resumeButton.render(g, gc.getInput());
         }
     }
-
-    private void loadEnemySpawner() {
-        int spawnerLayerIndex = map.getLayerIndex("spawner.enemy");
-        if (spawnerLayerIndex != -1) {
-            for (int x = 0; x < map.getWidth(); x++) {
-                for (int y = 0; y < map.getHeight(); y++) {
-                    int tileId = map.getTileId(x, y, spawnerLayerIndex);
-                    if (tileId != 0) {
-                        float worldX = x * map.getTileWidth();
-                        float worldY = y * map.getTileHeight();
-                        spawners.add(new EnemySpawner(worldX, worldY));
-                    }
-                }
-            }
-        }
-    }
-
-    private void loadPlayerSpawner() {
-        int spawnerLayerIndex = map.getLayerIndex("spawner.player");
-        if (spawnerLayerIndex != -1) {
-            for (int x = 0; x < map.getWidth(); x++) {
-                for (int y = 0; y < map.getHeight(); y++) {
-                    int tileId = map.getTileId(x, y, spawnerLayerIndex);
-                    if (tileId != 0) {
-                        playerSpawnerX = x * map.getTileWidth();
-                        playerSpawnerY = y * map.getTileHeight();
-                    }
-                }
-            }
-        }
-    }
-
 
 
 
@@ -207,8 +199,13 @@ public class Connected extends BasicGame {
         try {
             AppGameContainer container = new AppGameContainer(new Connected("Connected"));
             container.setDisplayMode(1920, 1080, true);
-            container.setIcon("res/icon.png");
-            container.setShowFPS(true);
+            container.setIcons(new String[] {
+                    "res/icon32.png",
+                    "res/icon64.png",
+                    "res/icon128.png"
+
+            });
+            container.setShowFPS(false);
             container.start();
         } catch (SlickException e) {
             e.printStackTrace();

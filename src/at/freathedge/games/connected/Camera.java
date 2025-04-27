@@ -17,7 +17,9 @@ public class Camera {
     private float zoomFactor = 1.0f;
     private float screenWidth, screenHeight;
 
-    private TiledMap map;
+
+
+    private GameMap map;
 
     public Camera() {
         this.x = 0;
@@ -26,20 +28,11 @@ public class Camera {
         this.targetY = 0;
     }
 
-    public void setMap(TiledMap map) {
+    public void setMap(GameMap map) {
         this.map = map;
     }
 
-    /**
-     * Aktualisiert die Kameraposition so, dass der Spieler
-     * immer in der Mitte des Bildschirms bleibt.
-     *
-     * @param playerX      X-Position des Spielers in Weltkoordinaten
-     * @param playerY      Y-Position des Spielers in Weltkoordinaten
-     * @param screenWidth  Breite des Fensters in Pixeln
-     * @param screenHeight Höhe des Fensters in Pixeln
-     * @param delta         Zeit seit letztem Frame (Millisekunden)
-     */
+
     public void update(float playerX, float playerY, float screenWidth, float screenHeight, int delta) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
