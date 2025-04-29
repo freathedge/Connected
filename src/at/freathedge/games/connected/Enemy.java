@@ -10,7 +10,7 @@ public class Enemy {
     private float width, height;
     private float speed = 0.05f;
     private Player player;
-    private TiledMap map;
+    private GameMap map;
     private Image image;
     private Rectangle hitbox;
 
@@ -21,7 +21,7 @@ public class Enemy {
     private int damageRadius = 15;
 
 
-    public Enemy(float x, float y, Player player, TiledMap map, int damage) throws SlickException {
+    public Enemy(float x, float y, Player player, GameMap map, int damage) throws SlickException {
         this.x = x;
         this.y = y;
         this.player = player;

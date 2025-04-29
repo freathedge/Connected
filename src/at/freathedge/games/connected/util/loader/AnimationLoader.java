@@ -1,4 +1,4 @@
-package at.freathedge.games.connected.util;
+package at.freathedge.games.connected.util.loader;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;

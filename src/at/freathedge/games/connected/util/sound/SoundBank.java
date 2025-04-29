@@ -1,4 +1,4 @@
-package at.freathedge.games.connected.util;
+package at.freathedge.games.connected.util.sound;
 
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.SlickException;

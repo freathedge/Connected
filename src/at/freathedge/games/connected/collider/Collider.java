@@ -1,5 +1,6 @@
 package at.freathedge.games.connected.collider;
 
+import at.freathedge.games.connected.util.map.BetterTiledMap;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -12,10 +13,10 @@ import java.util.Map;
 
 public class Collider {
 
-    private final TiledMap map;
+    private final BetterTiledMap map;
     private final Map<Integer, Rectangle> wallTileBounds = new HashMap<>();
 
-    public Collider(TiledMap map) throws SlickException {
+    public Collider(BetterTiledMap map) throws SlickException {
         this.map = map;
         calculateTileBounds();
     }

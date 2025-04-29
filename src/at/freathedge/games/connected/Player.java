@@ -1,8 +1,8 @@
 package at.freathedge.games.connected;
 
 import at.freathedge.games.connected.collider.Collider;
-import at.freathedge.games.connected.util.AnimationLoader;
-import at.freathedge.games.connected.util.SoundBank;
+import at.freathedge.games.connected.util.loader.AnimationLoader;
+import at.freathedge.games.connected.util.sound.SoundBank;
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.tiled.TiledMap;
@@ -20,7 +20,7 @@ public class Player {
     private final int maxHealth = 100;
     private int health = 100;
 
-    private final TiledMap map;
+    private final GameMap map;
 
     private Animation idleAnimation;
     private Animation walkFrontAnimation;
@@ -70,7 +70,7 @@ public class Player {
         FRONT, BACK, LEFT, RIGHT
     }
 
-    public Player(float x, float y, TiledMap map) throws SlickException {
+    public Player(float x, float y, GameMap map) throws SlickException {
         this.x = x;
         this.y = y;
         this.map = map;
@@ -80,7 +80,7 @@ public class Player {
         loadWallTileImages();
         setDirection(currentDirection);
         this.punchDirection = currentDirection;
-        this.collider = new Collider(map);
+        this.collider = new Collider(map.getMap());
 
     }
 
@@ -253,7 +253,6 @@ public class Player {
     }
 
     private void loadAnimations() throws SlickException {
-
         int frameDuration = 100;
         idleAnimation = AnimationLoader.loadAnimation("res/player/idle/player_idle", 6, frameDuration);
         walkFrontAnimation = AnimationLoader.loadAnimation("res/player/walk_front/player_walking_front", 6, frameDuration);
@@ -337,16 +336,10 @@ public class Player {
             }
         }
 
-        if (onPath) {
-            System.out.println("floor.path");
-            return "floor.path";
-        }
-        if (onGrass) {
-            System.out.println("floor.grass");
-            return "floor.grass";
-        }
+        if (onPath) return "floor.path";
+        if (onGrass) return "floor.grass";
 
-        // Standardfallback
+
         return "floor.grass";
     }
 

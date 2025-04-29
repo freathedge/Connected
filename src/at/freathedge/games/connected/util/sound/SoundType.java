@@ -1,4 +1,4 @@
-package at.freathedge.games.connected.util;
+package at.freathedge.games.connected.util.sound;
 
 public enum SoundType {
     SWING,

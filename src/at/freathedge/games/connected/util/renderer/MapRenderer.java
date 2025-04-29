@@ -1,23 +1,24 @@
-package at.freathedge.games.connected.util;
+package at.freathedge.games.connected.util.renderer;
 
 import at.freathedge.games.connected.Camera;
 import at.freathedge.games.connected.GameMap;
 import at.freathedge.games.connected.Player;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
+import at.freathedge.games.connected.util.map.BetterTileSet;
+import at.freathedge.games.connected.util.handler.MapHandler;
+import org.newdawn.slick.*;
 
 public class MapRenderer {
 
+    private final MapHandler mapHandler;
     private final GameMap gameMap;
     private final Camera camera;
     private final Player player;
 
-    public MapRenderer(GameMap gameMap, Camera camera, Player player) {
+    public MapRenderer(GameMap gameMap, Camera camera, Player player, MapHandler mapHandler) {
         this.gameMap = gameMap;
         this.camera = camera;
         this.player = player;
+        this.mapHandler = mapHandler;
     }
 
     public void renderMap(Graphics g, GameContainer gc) throws SlickException {
@@ -45,16 +46,9 @@ public class MapRenderer {
         int playerLayerIndex = gameMap.getLayerIndex("player");
 
         for (int i = 0; i < gameMap.getLayerCount(); i++) {
-            // Achtung: Hier brauchen wir eine kleine Anpassung für Layer-Properties.
-            // Falls du später Layer-Properties brauchst, müsstest du sie in GameMap extra abfragen.
-            // Vorläufig überspringen wir die skipRender-Abfrage.
-
             if (playerLayerIndex != -1 && playerLayerIndex == i) {
-                float mouseScreenX = gc.getInput().getMouseX();
-                float mouseScreenY = gc.getInput().getMouseY();
-                float mouseWorldX = camera.getX() + mouseScreenX / camera.getZoom();
-                float mouseWorldY = camera.getY() + mouseScreenY / camera.getZoom();
-
+                float mouseWorldX = camera.getX() + gc.getInput().getMouseX() / camera.getZoom();
+                float mouseWorldY = camera.getY() + gc.getInput().getMouseY() / camera.getZoom();
                 player.render(g, mouseWorldX, mouseWorldY);
             }
 
@@ -62,9 +56,16 @@ public class MapRenderer {
                 for (int y = startY; y < endY; y++) {
                     int tileID = gameMap.getTileId(x, y, i);
                     if (tileID != 0) {
-                        Image tileImage = gameMap.getTileImage(x, y, i);
-                        if (tileImage != null) {
-                            tileImage.draw(x * tileWidth, y * tileHeight);
+                        BetterTileSet tileSet = (BetterTileSet) gameMap.getMap().findTileSet(tileID);
+
+                        if (tileSet != null && tileSet.isAnimated(tileID)) {
+                            Animation anim = tileSet.getAnimation(tileID);
+                            anim.draw(x * tileWidth, y * tileHeight);
+                        } else {
+                            Image tileImage = gameMap.getTileImage(x, y, i);
+                            if (tileImage != null) {
+                                tileImage.draw(x * tileWidth, y * tileHeight);
+                            }
                         }
                     }
                 }

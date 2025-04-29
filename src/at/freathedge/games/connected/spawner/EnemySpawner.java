@@ -1,6 +1,7 @@
 package at.freathedge.games.connected.spawner;
 
 import at.freathedge.games.connected.Enemy;
+import at.freathedge.games.connected.GameMap;
 import at.freathedge.games.connected.Player;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.tiled.TiledMap;
@@ -19,7 +20,7 @@ public class EnemySpawner {
         this.spawnCooldown = 3000 + random.nextInt(10000);
     }
 
-    public Enemy update(int delta, Player player, TiledMap map) throws SlickException {
+    public Enemy update(int delta, Player player, GameMap map) throws SlickException {
         timeSinceLastSpawn += delta;
         if (timeSinceLastSpawn >= spawnCooldown) {
             timeSinceLastSpawn = 0;
