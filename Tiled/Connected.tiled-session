@@ -11,14 +11,30 @@
         "": {
             "scaleInDock": 1
         },
+        "Grass.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 4
+        },
+        "Houses extras.tsx": {
+            "scaleInDock": 0.33,
+            "scaleInEditor": 1
+        },
         "Outdoor Decoration.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 1.5,
+            "scaleInDock": 2,
             "scaleInEditor": 3
         },
         "Trees.tsx": {
-            "scaleInDock": 1,
+            "scaleInDock": 1.5,
             "scaleInEditor": 3
+        },
+        "Water.tsx": {
+            "scaleInDock": 2,
+            "scaleInEditor": 2
+        },
+        "cobble_road.tsx": {
+            "scaleInDock": 3,
+            "scaleInEditor": 1
         },
         "forest.tsx": {
             "dynamicWrapping": true,
@@ -30,8 +46,12 @@
             "scaleInDock": 1.5,
             "scaleInEditor": 3
         },
-        "pigs.tsx": {
+        "houses_spritesheet.tsx": {
             "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "pigs.tsx": {
+            "scaleInDock": 1.5,
             "scaleInEditor": 3
         },
         "pixil-frame-0 (12).tsx": {
@@ -39,18 +59,23 @@
             "scaleInEditor": 1
         },
         "spawnmap.tmx": {
-            "scale": 2,
-            "selectedLayer": 4,
+            "scale": 1,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 2829,
-                "y": 2676
+                "x": 3154,
+                "y": 2153
             }
         },
         "spawnmap.tmx#pigs": {
             "scaleInEditor": 1
+        },
+        "special_buildings.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 2
         }
     },
-    "last.imagePath": "E:/coding/Java/Games/Connected/Tiled/Cute_Fantasy/House/Buildings/Special_Buildings",
+    "frame.defaultDuration": 100,
+    "last.imagePath": "E:/coding/Java/Games/Connected/Tiled/Cute_Fantasy/Outdoor decoration/Outdoor_Decor_Animations/Grass_Animations",
     "map.height": 500,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,
@@ -60,17 +85,29 @@
         "spawnmap.tmx",
         "grass tiles spritesheet.tsx",
         "Outdoor Decoration.tsx",
-        "Trees.tsx"
+        "Trees.tsx",
+        "pigs.tsx",
+        "Water.tsx",
+        "houses_spritesheet.tsx",
+        "cobble_road.tsx",
+        "special_buildings.tsx",
+        "Houses extras.tsx",
+        "Grass.tsx"
     ],
     "project": "Connected.tiled-project",
     "recentFiles": [
+        "Grass.tsx",
+        "Houses extras.tsx",
+        "special_buildings.tsx",
+        "cobble_road.tsx",
+        "houses_spritesheet.tsx",
+        "Water.tsx",
         "pigs.tsx",
         "Trees.tsx",
         "Outdoor Decoration.tsx",
         "grass tiles spritesheet.tsx",
         "spawnmap.tmx",
-        "pixil-frame-0 (12).tsx",
-        "forest.tsx"
+        "pixil-frame-0 (12).tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

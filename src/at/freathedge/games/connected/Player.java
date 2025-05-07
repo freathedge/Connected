@@ -49,8 +49,6 @@ public class Player {
     private final int damageEffectDuration = 150;
 
     private long lastStepSoundTime = 0;
-
-
     private long lastDamageSoundTime = 0;
 
     private Map<Integer, Image> wallTileImages = new HashMap<>();
@@ -142,7 +140,7 @@ public class Player {
         }
 
         long now = System.currentTimeMillis();
-        if (moving && now - lastStepSoundTime >= 500) {
+        if (moving && now - lastStepSoundTime >= 400) {
             String layerName = getCurrentFootstepLayer();
             switch (layerName) {
                 case "floor.grass":
